@@ -1,0 +1,1014 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fluxo dos processos do Saldo+</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #002364; --cyan: #00B4D8; --orange: #F28C28; --magenta: #C2185B;
+    --bg: #F5F7FB; --card: #FFFFFF; --text: #1B2433; --muted: #5A6475; --line: #D7DDE8;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Poppins", Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+  header { background: var(--navy); color: #fff; padding: 28px 32px; }
+  header h1 { margin: 0 0 4px; font-size: 24px; font-weight: 600; }
+  header p { margin: 0; opacity: .85; font-size: 14px; }
+  main { max-width: 1280px; margin: 0 auto; padding: 24px 16px 48px; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+  h2 { margin: 0 0 6px; font-size: 18px; color: var(--navy); font-weight: 600; }
+  h3 { font-size: 14px; color: var(--navy); margin: 22px 0 8px; font-weight: 600; }
+  .sub { margin: 0 0 18px; color: var(--muted); font-size: 13px; }
+  .steps { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .steps span { font-size: 12px; font-weight: 500; padding: 6px 12px; border-radius: 999px; background: #E8EEF9; color: var(--navy); }
+  .steps span b { color: var(--orange); margin-right: 4px; }
+  .diagram { overflow: auto; border: 1px solid var(--line); border-radius: 8px; background: #fff; max-height: 82vh; }
+  .diagram svg { display: block; }
+  .diagram.fit svg { width: 100%; height: auto; }
+  .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .toolbar small { color: var(--muted); font-size: 12px; }
+  .toolbar button { font-family: inherit; font-size: 12px; font-weight: 500; border: 1px solid var(--navy); background: #fff; color: var(--navy); padding: 6px 14px; border-radius: 999px; cursor: pointer; }
+  .toolbar button.on { background: var(--navy); color: #fff; }
+  .legend { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 14px; font-size: 12px; color: var(--muted); align-items: center; }
+  .legend div { display: flex; align-items: center; gap: 6px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { border: 1px solid var(--line); padding: 9px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--navy); color: #fff; font-weight: 500; }
+  tbody tr:nth-child(even) td { background: #F8FAFD; }
+  .table-wrap { overflow-x: auto; }
+  td.c { text-align: center; font-weight: 600; width: 80px; }
+  td ul { margin: 0; padding-left: 18px; }
+  .R { color: var(--orange); } .A { color: var(--magenta); } .C { color: #0089A8; } .I { color: var(--muted); }
+  .phase td { background: #E8EEF9 !important; font-weight: 600; color: var(--navy); }
+  code { background: #EEF2F8; padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+  .note { font-size: 12px; color: var(--muted); margin-top: 12px; }
+  .roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+  .role { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .role h4 { margin: 0 0 6px; color: var(--navy); font-size: 14px; font-weight: 600; border-left: 4px solid var(--orange); padding-left: 8px; }
+  .role ul { margin: 0; padding-left: 18px; font-size: 13px; }
+  .role-ap { font-size: 12px; color: var(--muted); margin: 8px 0 0; }
+  .sla-pill { font-size: 12px; font-weight: 600; color: #006C85; background: #E3F6FA; border-radius: 999px; padding: 2px 10px; white-space: nowrap; display: inline-block; }
+  .sla-pill.wk { color: #7A4300; background: #FFF1DF; }
+  .sla-pill.ev { color: var(--magenta); background: #FBE7EF; }
+  .sla-pill.ct { color: var(--muted); background: #EEF1F5; }
+  .sim { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: flex-end; background: #F8FAFD; border: 1px solid var(--line); border-radius: 8px; padding: 14px; margin-bottom: 16px; }
+  .sim label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 500; color: var(--navy); }
+  .sim label.chk { flex-direction: row; align-items: center; gap: 8px; padding-bottom: 8px; }
+  .sim input[type=date], .sim input[type=text], .sim input[type=number] { font-family: inherit; font-size: 13px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--text); }
+  .sim input[type=text] { min-width: 240px; }
+  .sim input[type=number] { width: 90px; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .kpi { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; background: #fff; }
+  .kpi span { display: block; font-size: 11.5px; color: var(--muted); }
+  .kpi b { display: block; font-size: 16px; color: var(--navy); font-weight: 600; margin-top: 2px; }
+  .kpi.hl { border-color: var(--orange); background: #FFF6EC; }
+  td.d { white-space: nowrap; font-weight: 500; }
+  td.cod { font-weight: 600; color: var(--navy); white-space: nowrap; width: 52px; }
+  tr.gwrow td { background: #F6F1FC !important; }
+  .obs { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .st { font-size: 11.5px; font-weight: 600; border-radius: 999px; padding: 2px 9px; white-space: nowrap; display: inline-block; }
+  .st-novo { background: #FAECE7; color: #A8431F; } .st-aj { background: #FFF6D6; color: #7A5A00; } .st-ex { background: #EEF1F5; color: var(--muted); }
+  .sug { font-size: 10.5px; font-weight: 600; color: var(--muted); border: 1px dashed #9AA8C2; border-radius: 999px; padding: 1px 7px; margin-left: 6px; white-space: nowrap; }
+  @media (max-width: 600px) { header { padding: 22px 16px; } section { padding: 16px; } }
+  @media print {
+    @page { size: A3 landscape; margin: 10mm; }
+    body { background: #fff; }
+    section { border: none; padding: 0 0 16px; }
+    .diagram { overflow: visible; border: none; max-height: none; }
+    .diagram svg { width: 100%; height: auto; }
+    .toolbar, .sim { display: none; }
+    header, th, .phase td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Fluxo dos processos do Saldo+</h1>
+  <p>Do novo ciclo ao encerramento, com as posições da equipe como raias, quem faz cada etapa e em quanto tempo</p>
+</header>
+
+<main>
+
+<section>
+  <h2>1. Fluxo dos processos do Saldo+</h2>
+  <p class="sub">Cada faixa horizontal é uma posição da equipe (ou o parceiro e os participantes). Siga as setas da esquerda para a direita. O número laranja de cada etapa é o mesmo das tabelas abaixo.</p>
+
+  <div class="steps">
+    <span><b>0</b>Entrada e adesão</span>
+    <span><b>1</b>Inscrição, formalização e listagem</span>
+    <span><b>2</b>Planejamento do ciclo</span>
+    <span><b>3</b>Configuração da plataforma</span>
+    <span><b>4</b>Preparação</span>
+    <span><b>5</b>Execução da trilha</span>
+    <span><b>6</b>Monitoramento e relatórios</span>
+    <span><b>7</b>Encerramento do ciclo</span>
+  </div>
+
+  <div class="toolbar">
+    <small>Arraste para o lado para ver o fluxo inteiro. Passe o mouse numa etapa para ver o nome completo e o prazo.</small>
+    <div>
+      <button type="button" id="btnReal" class="on">Tamanho real</button>
+      <button type="button" id="btnFit">Ver inteiro</button>
+    </div>
+  </div>
+  <div class="diagram" id="diagram">
+<svg id="bpmn" viewBox="0 0 11490 1240" width="11490" height="1240" xmlns="http://www.w3.org/2000/svg" font-family="Poppins, Arial, sans-serif" role="img" aria-label="Fluxo dos processos do Saldo+">
+<defs>
+<marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#002364"/></marker>
+<marker id="arrb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#C2185B"/></marker>
+<style>
+.lane{fill:#FFFFFF;stroke:#C9D2E3}.lane-alt{fill:#F7F9FC;stroke:#C9D2E3}
+.lane-label{fill:#002364}.lane-text{fill:#FFFFFF;font-size:13px;font-weight:600;text-anchor:middle}
+.ph{fill:#E8EEF9;stroke:#C9D2E3}.ph-t{font-size:13px;font-weight:600;fill:#002364}
+.ph-line{stroke:#9AA8C2;stroke-width:1;stroke-dasharray:4 4}
+.t{font-size:12px;fill:#1B2433;text-anchor:middle}
+.flow{fill:none;stroke:#002364;stroke-width:1.5;marker-end:url(#arr)}
+.flow-back{fill:none;stroke:#C2185B;stroke-width:1.4;stroke-dasharray:5 3;marker-end:url(#arrb)}
+.gw{fill:#F1EBFA;stroke:#7B5EA7;stroke-width:2}.gwx{font-size:18px;fill:#7B5EA7;text-anchor:middle;font-weight:700}
+.pgw{fill:#FFFFFF;stroke:#002364;stroke-width:2}.pgwx{font-size:22px;fill:#002364;text-anchor:middle;font-weight:600}
+.q{font-size:11px;fill:#3E4757}.qc{font-size:10.5px;fill:#7B5EA7;font-weight:700}
+.lbl{font-size:11px;fill:#C2185B;font-weight:600}.lbl-bg{fill:#FFFFFF;opacity:.85}
+.start{fill:#FFFFFF;stroke:#0A9F5A;stroke-width:2}.end{fill:#FFFFFF;stroke:#C2185B;stroke-width:4}
+.ev{font-size:11px;fill:#5A6475}
+.code{font-size:10px;font-weight:700;fill:#FFFFFF;text-anchor:middle}
+.pill-t{font-size:10.5px;font-weight:600;text-anchor:middle}
+</style></defs>
+<rect class="lane" x="0" y="40" width="11490" height="150"/>
+<rect class="lane-label" x="0" y="40" width="150" height="150" stroke="#fff"/>
+<text class="lane-text" x="75" y="110.5">Parceiro /</text><text class="lane-text" x="75" y="127.5">Gestor escolar</text>
+<rect class="lane-alt" x="0" y="190" width="11490" height="150"/>
+<rect class="lane-label" x="0" y="190" width="150" height="150" stroke="#fff"/>
+<text class="lane-text" x="75" y="269.0">Coordenação</text>
+<rect class="lane" x="0" y="340" width="11490" height="150"/>
+<rect class="lane-label" x="0" y="340" width="150" height="150" stroke="#fff"/>
+<text class="lane-text" x="75" y="419.0">Mobilização</text>
+<rect class="lane-alt" x="0" y="490" width="11490" height="150"/>
+<rect class="lane-label" x="0" y="490" width="150" height="150" stroke="#fff"/>
+<text class="lane-text" x="75" y="560.5">Acompanhamento</text><text class="lane-text" x="75" y="577.5">e Facilitação</text>
+<rect class="lane" x="0" y="640" width="11490" height="150"/>
+<rect class="lane-label" x="0" y="640" width="150" height="150" stroke="#fff"/>
+<text class="lane-text" x="75" y="710.5">Operação da</text><text class="lane-text" x="75" y="727.5">Jornada</text>
+<rect class="lane-alt" x="0" y="790" width="11490" height="150"/>
+<rect class="lane-label" x="0" y="790" width="150" height="150" stroke="#fff"/>
+<text class="lane-text" x="75" y="860.5">Dados e</text><text class="lane-text" x="75" y="877.5">Automação</text>
+<rect class="lane" x="0" y="940" width="11490" height="150"/>
+<rect class="lane-label" x="0" y="940" width="150" height="150" stroke="#fff"/>
+<text class="lane-text" x="75" y="1019.0">Comunicação</text>
+<rect class="lane-alt" x="0" y="1090" width="11490" height="150"/>
+<rect class="lane-label" x="0" y="1090" width="150" height="150" stroke="#fff"/>
+<text class="lane-text" x="75" y="1160.5">Educador /</text><text class="lane-text" x="75" y="1177.5">Participante</text>
+<rect class="lane-label" x="0" y="0" width="150" height="40" stroke="#fff"/>
+<text class="lane-text" x="75.0" y="25">Fases</text>
+<rect class="ph" x="150" y="0" width="700" height="40"/>
+<text class="ph-t" x="164" y="25">0. Entrada e adesão</text>
+<rect class="ph" x="850" y="0" width="2040" height="40"/>
+<text class="ph-t" x="864" y="25">1. Inscrição, formalização e listagem</text>
+<line class="ph-line" x1="850" y1="40" x2="850" y2="1240"/>
+<rect class="ph" x="2890" y="0" width="840" height="40"/>
+<text class="ph-t" x="2904" y="25">2. Planejamento do ciclo</text>
+<line class="ph-line" x1="2890" y1="40" x2="2890" y2="1240"/>
+<rect class="ph" x="3730" y="0" width="1710" height="40"/>
+<text class="ph-t" x="3744" y="25">3. Configuração da plataforma</text>
+<line class="ph-line" x1="3730" y1="40" x2="3730" y2="1240"/>
+<rect class="ph" x="5440" y="0" width="1230" height="40"/>
+<text class="ph-t" x="5454" y="25">4. Preparação</text>
+<line class="ph-line" x1="5440" y1="40" x2="5440" y2="1240"/>
+<rect class="ph" x="6670" y="0" width="1710" height="40"/>
+<text class="ph-t" x="6684" y="25">5. Execução da trilha</text>
+<line class="ph-line" x1="6670" y1="40" x2="6670" y2="1240"/>
+<rect class="ph" x="8380" y="0" width="1680" height="40"/>
+<text class="ph-t" x="8394" y="25">6. Monitoramento e relatórios semanais</text>
+<line class="ph-line" x1="8380" y1="40" x2="8380" y2="1240"/>
+<rect class="ph" x="10060" y="0" width="1410" height="40"/>
+<text class="ph-t" x="10074" y="25">7. Encerramento do ciclo</text>
+<line class="ph-line" x1="10060" y1="40" x2="10060" y2="1240"/>
+<path class="flow" d="M251.0,265.0 L288.5,265.0 L288.5,415.0 L326.0,415.0"/>
+<path class="flow" d="M474.0,415.0 L506.0,415.0"/>
+<path class="flow" d="M654.0,415.0 L686.0,415.0"/>
+<path class="flow" d="M834.0,415.0 L866.0,415.0"/>
+<path class="flow" d="M1014.0,415.0 L1030.0,415.0 L1030.0,115.0 L1046.0,115.0"/>
+<path class="flow" d="M1194.0,115.0 L1229.0,115.0 L1229.0,415.0 L1264.0,415.0"/>
+<path class="flow" d="M1306.0,415.0 L1376.0,415.0"/>
+<path class="flow" d="M1285.0,394.0 L1285.0,353.0 L1780.0,353.0 L1780.0,384.0"/>
+<path class="flow" d="M1524.0,415.0 L1594.0,415.0"/>
+<path class="flow" d="M1636.0,415.0 L1706.0,415.0"/>
+<path class="flow" d="M1615.0,436.0 L1615.0,453.0"/>
+<path class="flow" d="M1854.0,415.0 L1870.0,415.0 L1870.0,115.0 L1886.0,115.0"/>
+<path class="flow" d="M2034.0,115.0 L2069.0,115.0 L2069.0,415.0 L2104.0,415.0"/>
+<path class="flow" d="M2146.0,415.0 L2216.0,415.0"/>
+<path class="flow-back" d="M2125.0,394.0 L2125.0,172.0 L1906.0,172.0 L1906.0,146.0"/>
+<path class="flow" d="M2364.0,415.0 L2380.0,415.0 L2380.0,115.0 L2396.0,115.0"/>
+<path class="flow" d="M2544.0,115.0 L2560.0,115.0 L2560.0,415.0 L2576.0,415.0"/>
+<path class="flow" d="M2724.0,415.0 L2794.0,415.0"/>
+<path class="flow" d="M2836.0,415.0 L2871.0,415.0 L2871.0,715.0 L2906.0,715.0"/>
+<path class="flow-back" d="M2815.0,394.0 L2815.0,172.0 L2416.0,172.0 L2416.0,146.0"/>
+<path class="flow" d="M3054.0,715.0 L3124.0,715.0"/>
+<path class="flow" d="M3166.0,715.0 L3236.0,715.0"/>
+<path class="flow" d="M3166.0,715.0 L3184.0,715.0 L3184.0,1015.0 L3236.0,1015.0"/>
+<path class="flow" d="M3384.0,715.0 L3416.0,715.0"/>
+<path class="flow" d="M3564.0,715.0 L3634.0,715.0"/>
+<path class="flow" d="M3384.0,1015.0 L3616.0,1015.0 L3616.0,715.0 L3634.0,715.0"/>
+<path class="flow" d="M3676.0,715.0 L3784.0,715.0"/>
+<path class="flow" d="M3826.0,715.0 L3896.0,715.0"/>
+<path class="flow" d="M3805.0,694.0 L3805.0,653.0 L4150.0,653.0 L4150.0,684.0"/>
+<path class="flow" d="M4044.0,715.0 L4076.0,715.0"/>
+<path class="flow" d="M4224.0,715.0 L4256.0,715.0"/>
+<path class="flow" d="M4404.0,715.0 L4436.0,715.0"/>
+<path class="flow" d="M4584.0,715.0 L4600.0,715.0 L4600.0,865.0 L4616.0,865.0"/>
+<path class="flow" d="M4764.0,865.0 L4834.0,865.0"/>
+<path class="flow-back" d="M4855.0,886.0 L4855.0,920.0 L4636.0,920.0 L4636.0,896.0"/>
+<path class="flow" d="M4876.0,865.0 L4911.0,865.0 L4911.0,565.0 L4946.0,565.0"/>
+<path class="flow" d="M5094.0,565.0 L5110.0,565.0 L5110.0,715.0 L5126.0,715.0"/>
+<path class="flow" d="M5274.0,715.0 L5344.0,715.0"/>
+<path class="flow" d="M5386.0,715.0 L5421.0,715.0 L5421.0,865.0 L5456.0,865.0"/>
+<path class="flow-back" d="M5365.0,736.0 L5365.0,770.0 L4276.0,770.0 L4276.0,746.0"/>
+<path class="flow" d="M5604.0,865.0 L5620.0,865.0 L5620.0,565.0 L5636.0,565.0"/>
+<path class="flow" d="M5784.0,565.0 L5854.0,565.0"/>
+<path class="flow" d="M5896.0,565.0 L5966.0,565.0"/>
+<path class="flow" d="M5875.0,544.0 L5875.0,503.0 L6220.0,503.0 L6220.0,534.0"/>
+<path class="flow" d="M6114.0,565.0 L6146.0,565.0"/>
+<path class="flow" d="M6294.0,565.0 L6326.0,565.0"/>
+<path class="flow" d="M6474.0,565.0 L6506.0,565.0"/>
+<path class="flow" d="M6654.0,565.0 L6670.0,565.0 L6670.0,1165.0 L6686.0,1165.0"/>
+<path class="flow" d="M6834.0,1165.0 L6904.0,1165.0"/>
+<path class="flow" d="M6925.0,1144.0 L6925.0,565.0 L7016.0,565.0"/>
+<path class="flow" d="M6946.0,1165.0 L7840.0,1165.0 L7840.0,565.0 L7856.0,565.0"/>
+<path class="flow" d="M7164.0,565.0 L7234.0,565.0"/>
+<path class="flow" d="M7276.0,565.0 L7311.0,565.0 L7311.0,715.0 L7346.0,715.0"/>
+<path class="flow-back" d="M7255.0,586.0 L7255.0,1119.0 L6760.0,1119.0 L6760.0,1134.0"/>
+<path class="flow" d="M7494.0,715.0 L7564.0,715.0"/>
+<path class="flow" d="M7606.0,715.0 L7676.0,715.0"/>
+<path class="flow-back" d="M7585.0,736.0 L7585.0,1119.0 L6760.0,1119.0 L6760.0,1134.0"/>
+<path class="flow-back" d="M7696.0,746.0 L7696.0,1119.0 L6760.0,1119.0 L6760.0,1134.0"/>
+<path class="flow" d="M8004.0,565.0 L8036.0,565.0"/>
+<path class="flow" d="M8184.0,565.0 L8200.0,565.0 L8200.0,415.0 L8216.0,415.0"/>
+<path class="flow" d="M8364.0,415.0 L8380.0,415.0 L8380.0,865.0 L8396.0,865.0"/>
+<path class="flow" d="M8544.0,865.0 L8614.0,865.0"/>
+<path class="flow" d="M8656.0,865.0 L8726.0,865.0"/>
+<path class="flow-back" d="M8635.0,886.0 L8635.0,920.0 L8416.0,920.0 L8416.0,896.0"/>
+<path class="flow" d="M8874.0,865.0 L8906.0,865.0"/>
+<path class="flow" d="M9054.0,865.0 L9070.0,865.0 L9070.0,565.0 L9086.0,565.0"/>
+<path class="flow" d="M9234.0,565.0 L9304.0,565.0"/>
+<path class="flow" d="M9346.0,565.0 L9416.0,565.0"/>
+<path class="flow" d="M9325.0,544.0 L9325.0,265.0 L9964.0,265.0"/>
+<path class="flow" d="M9564.0,565.0 L9634.0,565.0"/>
+<path class="flow" d="M9655.0,544.0 L9655.0,415.0 L9746.0,415.0"/>
+<path class="flow" d="M9676.0,565.0 L9948.0,565.0 L9948.0,265.0 L9964.0,265.0"/>
+<path class="flow" d="M9894.0,415.0 L9929.0,415.0 L9929.0,265.0 L9964.0,265.0"/>
+<path class="flow" d="M10006.0,265.0 L10041.0,265.0 L10041.0,565.0 L10076.0,565.0"/>
+<path class="flow-back" d="M9985.0,286.0 L9985.0,933.0 L8416.0,933.0 L8416.0,896.0"/>
+<path class="flow" d="M10224.0,565.0 L10240.0,565.0 L10240.0,715.0 L10256.0,715.0"/>
+<path class="flow" d="M10404.0,715.0 L10436.0,715.0"/>
+<path class="flow" d="M10584.0,715.0 L10600.0,715.0 L10600.0,265.0 L10616.0,265.0"/>
+<path class="flow" d="M10764.0,265.0 L10780.0,265.0 L10780.0,415.0 L10796.0,415.0"/>
+<path class="flow" d="M10944.0,415.0 L10960.0,415.0 L10960.0,265.0 L10976.0,265.0"/>
+<path class="flow" d="M11124.0,265.0 L11140.0,265.0 L11140.0,865.0 L11156.0,865.0"/>
+<path class="flow" d="M11304.0,865.0 L11341.5,865.0 L11341.5,265.0 L11379.0,265.0"/>
+<circle class="start" cx="235.0" cy="265.0" r="16"/>
+<text class="qc" text-anchor="middle" x="235.0" y="241.0">E0</text>
+<text class="ev" text-anchor="middle" x="235.0" y="299.0">Novo ciclo:</text>
+<text class="ev" text-anchor="middle" x="235.0" y="312.0">metas definidas</text>
+<g><title>0.1 — Prospectar escolas, ONGs e parceiros e apresentar o programa</title><rect x="326.0" y="384.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="400" y="412.0">Prospectar escolas,</text><text class="t" x="400" y="426.0">ONGs e parceiros</text>
+<rect x="332.0" y="376.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="347.8" y="387.0">0.1</text>
+<g><title>Prazo: Contínuo, conforme metas do ciclo</title><rect x="362.0" y="450.0" width="74.0" height="16" rx="8" fill="#EEF1F5" stroke="#5A6475" stroke-width="0.8"/><text class="pill-t" x="399.0" y="462.0" fill="#5A6475">⏱ contínuo</text></g>
+<g><title>0.2 — Alinhar a adesão: papéis, cronograma e requisitos (internet e laboratório)</title><rect x="506.0" y="384.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="580" y="405.0">Alinhar a adesão:</text><text class="t" x="580" y="419.0">papéis, cronograma</text><text class="t" x="580" y="433.0">e requisitos</text>
+<rect x="512.0" y="376.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="527.8" y="387.0">0.2</text>
+<g><title>Prazo: Até 5 dias úteis após o primeiro contato</title><rect x="542.0" y="450.0" width="62.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="573.0" y="462.0" fill="#006C85">⏱ 5 d.u.</text></g>
+<g><title>0.3 — Definir o ponto focal da escola/organização</title><rect x="686.0" y="384.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="760" y="412.0">Definir o ponto</text><text class="t" x="760" y="426.0">focal</text>
+<rect x="692.0" y="376.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="707.8" y="387.0">0.3</text>
+<g><title>Prazo: Até 2 dias úteis após o alinhamento</title><rect x="722.0" y="450.0" width="62.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="753.0" y="462.0" fill="#006C85">⏱ 2 d.u.</text></g>
+<g><title>1.1 — Enviar formulário de inscrição</title><rect x="866.0" y="384.0" width="148" height="62" rx="10" fill="#FFF6D6" stroke="#B8860B" stroke-width="1.6"/></g>
+<text class="t" x="940" y="412.0">Enviar formulário</text><text class="t" x="940" y="426.0">de inscrição</text>
+<rect x="872.0" y="376.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="887.8" y="387.0">1.1</text>
+<g><title>Prazo: Até 1 dia útil após definir o ponto focal</title><rect x="902.0" y="450.0" width="62.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="933.0" y="462.0" fill="#006C85">⏱ 1 d.u.</text></g>
+<g><title>1.2 — Preencher formulário de inscrição</title><rect x="1046.0" y="84.0" width="148" height="62" rx="10" fill="#FFFFFF" stroke="#002364" stroke-width="1.6"/></g>
+<text class="t" x="1120" y="105.0">Preencher</text><text class="t" x="1120" y="119.0">formulário de</text><text class="t" x="1120" y="133.0">inscrição</text>
+<rect x="1052.0" y="76.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="1067.8" y="87.0">1.2</text>
+<g><title>Prazo: Até 5 dias úteis após receber o formulário</title><rect x="1082.0" y="150.0" width="62.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="1113.0" y="162.0" fill="#006C85">⏱ 5 d.u.</text></g>
+<polygon class="gw" points="1285.0,394.0 1306.0,415.0 1285.0,436.0 1264.0,415.0"/>
+<text class="gwx" x="1285.0" y="421.0">X</text>
+<text class="qc" text-anchor="middle" x="1285.0" y="453.0">G1</text>
+<text class="q" text-anchor="middle" x="1285.0" y="466.0">Tem internet e</text>
+<text class="q" text-anchor="middle" x="1285.0" y="479.0">laboratório?</text>
+<g><title>1.2a — Sem infraestrutura: avaliar alternativa (modelo híbrido/material impresso) ou registrar o motivo e reavaliar no próximo ciclo</title><rect x="1376.0" y="384.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="1450" y="405.0">Avaliar alternativa</text><text class="t" x="1450" y="419.0">(híbrido ou</text><text class="t" x="1450" y="433.0">material impresso)</text>
+<rect x="1382.0" y="376.0" width="38.0" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="1401.0" y="387.0">1.2a</text>
+<g><title>Prazo: Até 5 dias úteis após identificar a falta de estrutura</title><rect x="1412.0" y="450.0" width="62.0" height="16" rx="8" fill="#FBE7EF" stroke="#C2185B" stroke-width="0.8"/><text class="pill-t" x="1443.0" y="462.0" fill="#C2185B">⏱ 5 d.u.</text></g>
+<polygon class="gw" points="1615.0,394.0 1636.0,415.0 1615.0,436.0 1594.0,415.0"/>
+<text class="gwx" x="1615.0" y="421.0">X</text>
+<text class="q" text-anchor="middle" x="1615.0" y="369.0">Alternativa</text>
+<text class="q" text-anchor="middle" x="1615.0" y="382.0">viável?</text>
+<circle class="end" cx="1615.0" cy="469.0" r="16"/>
+<text class="ev" text-anchor="end" x="1591.0" y="467.0">Reavaliar no</text>
+<text class="ev" text-anchor="end" x="1591.0" y="480.0">próximo ciclo</text>
+<g><title>1.3 — Enviar formulário de formalização</title><rect x="1706.0" y="384.0" width="148" height="62" rx="10" fill="#FFF6D6" stroke="#B8860B" stroke-width="1.6"/></g>
+<text class="t" x="1780" y="412.0">Enviar formulário</text><text class="t" x="1780" y="426.0">de formalização</text>
+<rect x="1712.0" y="376.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="1727.8" y="387.0">1.3</text>
+<g><title>Prazo: Até 1 dia útil após confirmar a infraestrutura</title><rect x="1742.0" y="450.0" width="62.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="1773.0" y="462.0" fill="#006C85">⏱ 1 d.u.</text></g>
+<g><title>1.4 — Preencher e enviar formalização</title><rect x="1886.0" y="84.0" width="148" height="62" rx="10" fill="#FFFFFF" stroke="#002364" stroke-width="1.6"/></g>
+<text class="t" x="1960" y="112.0">Preencher e enviar</text><text class="t" x="1960" y="126.0">formalização</text>
+<rect x="1892.0" y="76.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="1907.8" y="87.0">1.4</text>
+<g><title>Prazo: Cobrar após 5 dias úteis sem retorno</title><rect x="1922.0" y="150.0" width="62.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="1953.0" y="162.0" fill="#006C85">⏱ 5 d.u.</text></g>
+<polygon class="gw" points="2125.0,394.0 2146.0,415.0 2125.0,436.0 2104.0,415.0"/>
+<text class="gwx" x="2125.0" y="421.0">X</text>
+<text class="qc" text-anchor="middle" x="2125.0" y="453.0">G2</text>
+<text class="q" text-anchor="middle" x="2125.0" y="466.0">Formalização</text>
+<text class="q" text-anchor="middle" x="2125.0" y="479.0">recebida?</text>
+<g><title>1.5 — Solicitar a listagem de participantes</title><rect x="2216.0" y="384.0" width="148" height="62" rx="10" fill="#FFF6D6" stroke="#B8860B" stroke-width="1.6"/></g>
+<text class="t" x="2290" y="405.0">Solicitar a</text><text class="t" x="2290" y="419.0">listagem de</text><text class="t" x="2290" y="433.0">participantes</text>
+<rect x="2222.0" y="376.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="2237.8" y="387.0">1.5</text>
+<g><title>Prazo: Até 1 dia útil após receber a formalização</title><rect x="2252.0" y="450.0" width="62.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="2283.0" y="462.0" fill="#006C85">⏱ 1 d.u.</text></g>
+<g><title>1.6 — Preencher e enviar a listagem</title><rect x="2396.0" y="84.0" width="148" height="62" rx="10" fill="#FFFFFF" stroke="#002364" stroke-width="1.6"/></g>
+<text class="t" x="2470" y="112.0">Preencher e enviar</text><text class="t" x="2470" y="126.0">a listagem</text>
+<rect x="2402.0" y="76.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="2417.8" y="87.0">1.6</text>
+<g><title>Prazo: Até 5 dias úteis após o pedido</title><rect x="2432.0" y="150.0" width="62.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="2463.0" y="162.0" fill="#006C85">⏱ 5 d.u.</text></g>
+<g><title>1.7 — Conferir e validar a listagem</title><rect x="2576.0" y="384.0" width="148" height="62" rx="10" fill="#FFF6D6" stroke="#B8860B" stroke-width="1.6"/></g>
+<text class="t" x="2650" y="412.0">Conferir e validar</text><text class="t" x="2650" y="426.0">a listagem</text>
+<rect x="2582.0" y="376.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="2597.8" y="387.0">1.7</text>
+<g><title>Prazo: Até 2 dias úteis após o recebimento</title><rect x="2612.0" y="450.0" width="62.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="2643.0" y="462.0" fill="#006C85">⏱ 2 d.u.</text></g>
+<polygon class="gw" points="2815.0,394.0 2836.0,415.0 2815.0,436.0 2794.0,415.0"/>
+<text class="gwx" x="2815.0" y="421.0">X</text>
+<text class="qc" text-anchor="middle" x="2815.0" y="453.0">G3</text>
+<text class="q" text-anchor="middle" x="2815.0" y="466.0">Dados</text>
+<text class="q" text-anchor="middle" x="2815.0" y="479.0">completos?</text>
+<g><title>2.1 — Montar o cronograma de execução da jornada (abertura, módulos, pré e pós, formações, encontros, encerramento)</title><rect x="2906.0" y="684.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="2980" y="705.0">Montar o cronograma</text><text class="t" x="2980" y="719.0">de execução</text><text class="t" x="2980" y="733.0">da jornada</text>
+<rect x="2912.0" y="676.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="2927.8" y="687.0">2.1</text>
+<g><title>Prazo: Até 30 dias antes do início do ciclo</title><rect x="2942.0" y="750.0" width="50.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="2967.0" y="762.0" fill="#006C85">⏱ D−30</text></g>
+<polygon class="pgw" points="3145.0,694.0 3166.0,715.0 3145.0,736.0 3124.0,715.0"/>
+<text class="pgwx" x="3145.0" y="723.0">+</text>
+<g><title>2.2 — Revisar e atualizar conteúdos e manuais para o ciclo</title><rect x="3236.0" y="684.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="3310" y="712.0">Revisar conteúdos</text><text class="t" x="3310" y="726.0">e manuais</text>
+<rect x="3242.0" y="676.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="3257.8" y="687.0">2.2</text>
+<g><title>Prazo: Até 10 dias úteis antes da formação</title><rect x="3272.0" y="750.0" width="68.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="3306.0" y="762.0" fill="#006C85">⏱ 10 d.u.</text></g>
+<g><title>2.4 — Planejar a comunicação do ciclo (divulgação e peças de mobilização)</title><rect x="3236.0" y="984.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="3310" y="1005.0">Planejar a</text><text class="t" x="3310" y="1019.0">comunicação</text><text class="t" x="3310" y="1033.0">do ciclo</text>
+<rect x="3242.0" y="976.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="3257.8" y="987.0">2.4</text>
+<g><title>Prazo: Até 20 dias antes do início do ciclo</title><rect x="3272.0" y="1050.0" width="50.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="3297.0" y="1062.0" fill="#006C85">⏱ D−20</text></g>
+<g><title>2.3 — Levantar orçamentos e contratar fornecedores do ciclo (facilitadores, kits, premiação, evento)</title><rect x="3416.0" y="684.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="3490" y="712.0">Orçar e contratar</text><text class="t" x="3490" y="726.0">fornecedores</text>
+<rect x="3422.0" y="676.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="3437.8" y="687.0">2.3</text>
+<g><title>Prazo: Até 15 dias antes da data de uso</title><rect x="3452.0" y="750.0" width="104.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="3504.0" y="762.0" fill="#006C85">⏱ 15 dias antes</text></g>
+<polygon class="pgw" points="3655.0,694.0 3676.0,715.0 3655.0,736.0 3634.0,715.0"/>
+<text class="pgwx" x="3655.0" y="723.0">+</text>
+<polygon class="gw" points="3805.0,694.0 3826.0,715.0 3805.0,736.0 3784.0,715.0"/>
+<text class="gwx" x="3805.0" y="721.0">X</text>
+<text class="qc" text-anchor="middle" x="3805.0" y="753.0">G4</text>
+<text class="q" text-anchor="middle" x="3805.0" y="766.0">Parceiro já</text>
+<text class="q" text-anchor="middle" x="3805.0" y="779.0">tem curso?</text>
+<g><title>3.1 — Duplicar o curso-base e gerar novo ID</title><rect x="3896.0" y="684.0" width="148" height="62" rx="10" fill="#FFF6D6" stroke="#B8860B" stroke-width="1.6"/></g>
+<text class="t" x="3970" y="705.0">Escolher curso-base</text><text class="t" x="3970" y="719.0">(Escolas ou Particip.),</text><text class="t" x="3970" y="733.0">duplicar e gerar ID</text>
+<rect x="3902.0" y="676.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="3917.8" y="687.0">3.1</text>
+<g><title>Prazo: Até 3 dias úteis após o planejamento</title><rect x="3932.0" y="750.0" width="62.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="3963.0" y="762.0" fill="#006C85">⏱ 3 d.u.</text></g>
+<g><title>3.2 — Criar turmas, associar ao curso e configurar acessos dos gestores</title><rect x="4076.0" y="684.0" width="148" height="62" rx="10" fill="#FFF6D6" stroke="#B8860B" stroke-width="1.6"/></g>
+<text class="t" x="4150" y="705.0">Criar turmas e</text><text class="t" x="4150" y="719.0">acessos dos</text><text class="t" x="4150" y="733.0">gestores</text>
+<rect x="4082.0" y="676.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="4097.8" y="687.0">3.2</text>
+<g><title>Prazo: Até 3 dias úteis após o curso com ID</title><rect x="4112.0" y="750.0" width="62.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="4143.0" y="762.0" fill="#006C85">⏱ 3 d.u.</text></g>
+<g><title>3.3 — Configurar ranking, Roda de Apoio, boas-vindas e identidade visual</title><rect x="4256.0" y="684.0" width="148" height="62" rx="10" fill="#FFF6D6" stroke="#B8860B" stroke-width="1.6"/></g>
+<text class="t" x="4330" y="705.0">Ranking, Roda de</text><text class="t" x="4330" y="719.0">Apoio, boas-vindas</text><text class="t" x="4330" y="733.0">e identidade visual</text>
+<rect x="4262.0" y="676.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="4277.8" y="687.0">3.3</text>
+<g><title>Prazo: Até 3 dias úteis após criar as turmas</title><rect x="4292.0" y="750.0" width="62.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="4323.0" y="762.0" fill="#006C85">⏱ 3 d.u.</text></g>
+<g><title>3.4 — Configurar os questionários pré e pós na plataforma</title><rect x="4436.0" y="684.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="4510" y="705.0">Configurar</text><text class="t" x="4510" y="719.0">questionários</text><text class="t" x="4510" y="733.0">pré e pós</text>
+<rect x="4442.0" y="676.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="4457.8" y="687.0">3.4</text>
+<g><title>Prazo: Até 3 dias úteis após a configuração</title><rect x="4472.0" y="750.0" width="62.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="4503.0" y="762.0" fill="#006C85">⏱ 3 d.u.</text></g>
+<g><title>3.5 — Cadastrar participantes via API e associar às turmas</title><rect x="4616.0" y="834.0" width="148" height="62" rx="10" fill="#FFF6D6" stroke="#B8860B" stroke-width="1.6"/></g>
+<text class="t" x="4690" y="855.0">Cadastrar</text><text class="t" x="4690" y="869.0">participantes</text><text class="t" x="4690" y="883.0">via API</text>
+<rect x="4622.0" y="826.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="4637.8" y="837.0">3.5</text>
+<g><title>Prazo: Até 2 dias úteis após a listagem validada</title><rect x="4652.0" y="900.0" width="62.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="4683.0" y="912.0" fill="#006C85">⏱ 2 d.u.</text></g>
+<polygon class="gw" points="4855.0,844.0 4876.0,865.0 4855.0,886.0 4834.0,865.0"/>
+<text class="gwx" x="4855.0" y="871.0">X</text>
+<text class="qc" text-anchor="middle" x="4855.0" y="806.0">G6</text>
+<text class="q" text-anchor="middle" x="4855.0" y="819.0">Inconsistências</text>
+<text class="q" text-anchor="middle" x="4855.0" y="832.0">na API?</text>
+<g><title>3.6 — Testar como usuário (jornada do aluno e do professor)</title><rect x="4946.0" y="534.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="5020" y="555.0">Testar como</text><text class="t" x="5020" y="569.0">usuário (aluno</text><text class="t" x="5020" y="583.0">e professor)</text>
+<rect x="4952.0" y="526.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="4967.8" y="537.0">3.6</text>
+<g><title>Prazo: Até 2 dias úteis após o cadastro</title><rect x="4982.0" y="600.0" width="62.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="5013.0" y="612.0" fill="#006C85">⏱ 2 d.u.</text></g>
+<g><title>3.7 — Conferência final, aprovar e liberar o curso</title><rect x="5126.0" y="684.0" width="148" height="62" rx="10" fill="#FFF6D6" stroke="#B8860B" stroke-width="1.6"/></g>
+<text class="t" x="5200" y="705.0">Conferência final,</text><text class="t" x="5200" y="719.0">aprovar e liberar</text><text class="t" x="5200" y="733.0">o curso</text>
+<rect x="5132.0" y="676.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="5147.8" y="687.0">3.7</text>
+<g><title>Prazo: Até 5 dias úteis antes do início da trilha</title><rect x="5162.0" y="750.0" width="74.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="5199.0" y="762.0" fill="#006C85">⏱ D−5 d.u.</text></g>
+<polygon class="gw" points="5365.0,694.0 5386.0,715.0 5365.0,736.0 5344.0,715.0"/>
+<text class="gwx" x="5365.0" y="721.0">X</text>
+<text class="qc" text-anchor="middle" x="5365.0" y="656.0">G7</text>
+<text class="q" text-anchor="middle" x="5365.0" y="669.0">Tudo</text>
+<text class="q" text-anchor="middle" x="5365.0" y="682.0">funcionando?</text>
+<g><title>4.1 — Gerar os logins de educadores e participantes</title><rect x="5456.0" y="834.0" width="148" height="62" rx="10" fill="#FFF6D6" stroke="#B8860B" stroke-width="1.6"/></g>
+<text class="t" x="5530" y="869.0">Gerar os logins</text>
+<rect x="5462.0" y="826.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="5477.8" y="837.0">4.1</text>
+<g><title>Prazo: Até 1 dia útil após liberar o curso</title><rect x="5492.0" y="900.0" width="62.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="5523.0" y="912.0" fill="#006C85">⏱ 1 d.u.</text></g>
+<g><title>4.2 — Enviar os logins e a comunicação de acesso</title><rect x="5636.0" y="534.0" width="148" height="62" rx="10" fill="#FFF6D6" stroke="#B8860B" stroke-width="1.6"/></g>
+<text class="t" x="5710" y="555.0">Enviar logins e</text><text class="t" x="5710" y="569.0">comunicação</text><text class="t" x="5710" y="583.0">de acesso</text>
+<rect x="5642.0" y="526.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="5657.8" y="537.0">4.2</text>
+<g><title>Prazo: Até 3 dias úteis antes do kick-off</title><rect x="5672.0" y="600.0" width="98.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="5721.0" y="612.0" fill="#006C85">⏱ 3 d.u. antes</text></g>
+<polygon class="gw" points="5875.0,544.0 5896.0,565.0 5875.0,586.0 5854.0,565.0"/>
+<text class="gwx" x="5875.0" y="571.0">X</text>
+<text class="qc" text-anchor="middle" x="5875.0" y="603.0">G8</text>
+<text class="q" text-anchor="middle" x="5875.0" y="616.0">Problema de</text>
+<text class="q" text-anchor="middle" x="5875.0" y="629.0">acesso?</text>
+<g><title>Resolver o acesso (níveis 1 e 2 ou novo login)</title><rect x="5966.0" y="534.0" width="148" height="62" rx="10" fill="#FFFFFF" stroke="#002364" stroke-width="1.6"/></g>
+<text class="t" x="6040" y="555.0">Resolver o acesso</text><text class="t" x="6040" y="569.0">(níveis 1 e 2 ou</text><text class="t" x="6040" y="583.0">novo login)</text>
+<g><title>Prazo: Até 1 dia útil após o aviso</title><rect x="6002.0" y="600.0" width="62.0" height="16" rx="8" fill="#FBE7EF" stroke="#C2185B" stroke-width="0.8"/><text class="pill-t" x="6033.0" y="612.0" fill="#C2185B">⏱ 1 d.u.</text></g>
+<g><title>4.3 — Formação de professores e multiplicadores</title><rect x="6146.0" y="534.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="6220" y="555.0">Formação de</text><text class="t" x="6220" y="569.0">professores e</text><text class="t" x="6220" y="583.0">multiplicadores</text>
+<rect x="6152.0" y="526.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="6167.8" y="537.0">4.3</text>
+<g><title>Prazo: Antes do início da trilha</title><rect x="6182.0" y="600.0" width="116.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="6240.0" y="612.0" fill="#006C85">⏱ antes do início</text></g>
+<g><title>4.4 — Live de kick-off com parceiro, escolas e educadores</title><rect x="6326.0" y="534.0" width="148" height="62" rx="10" fill="#FFF6D6" stroke="#B8860B" stroke-width="1.6"/></g>
+<text class="t" x="6400" y="569.0">Live de kick-off</text>
+<rect x="6332.0" y="526.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="6347.8" y="537.0">4.4</text>
+<g><title>Prazo: No início da trilha</title><rect x="6362.0" y="600.0" width="56.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="6390.0" y="612.0" fill="#006C85">⏱ dia 1</text></g>
+<g><title>4.5 — Aplicar o questionário pré (linha de base)</title><rect x="6506.0" y="534.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="6580" y="562.0">Aplicar o</text><text class="t" x="6580" y="576.0">questionário pré</text>
+<rect x="6512.0" y="526.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="6527.8" y="537.0">4.5</text>
+<g><title>Prazo: Na 1ª semana da trilha</title><rect x="6542.0" y="600.0" width="80.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="6582.0" y="612.0" fill="#006C85">⏱ 1ª semana</text></g>
+<g><title>5.1 — Realizar a trilha em sala</title><rect x="6686.0" y="1134.0" width="148" height="62" rx="10" fill="#FFFFFF" stroke="#002364" stroke-width="1.6"/></g>
+<text class="t" x="6760" y="1162.0">Realizar a trilha</text><text class="t" x="6760" y="1176.0">em sala</text>
+<rect x="6692.0" y="1126.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="6707.8" y="1137.0">5.1</text>
+<g><title>Prazo: Durante todo o ciclo</title><rect x="6722.0" y="1200.0" width="56.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="6750.0" y="1212.0" fill="#006C85">⏱ ciclo</text></g>
+<polygon class="gw" points="6925.0,1144.0 6946.0,1165.0 6925.0,1186.0 6904.0,1165.0"/>
+<text class="gwx" x="6925.0" y="1171.0">X</text>
+<text class="q" text-anchor="middle" x="6925.0" y="1203.0">Dúvida ou</text>
+<text class="q" text-anchor="middle" x="6925.0" y="1216.0">problema?</text>
+<g><title>5.2 — Atendimento na porta única (nível 1): dúvidas de uso, prazos, orientações</title><rect x="7016.0" y="534.0" width="148" height="62" rx="10" fill="#FFF6D6" stroke="#B8860B" stroke-width="1.6"/></g>
+<text class="t" x="7090" y="555.0">Nível 1: porta única</text><text class="t" x="7090" y="569.0">(dúvidas, prazos,</text><text class="t" x="7090" y="583.0">orientações)</text>
+<rect x="7022.0" y="526.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="7037.8" y="537.0">5.2</text>
+<g><title>Prazo: Resposta em até 1 dia útil</title><rect x="7052.0" y="600.0" width="62.0" height="16" rx="8" fill="#FBE7EF" stroke="#C2185B" stroke-width="0.8"/><text class="pill-t" x="7083.0" y="612.0" fill="#C2185B">⏱ 1 d.u.</text></g>
+<polygon class="gw" points="7255.0,544.0 7276.0,565.0 7255.0,586.0 7234.0,565.0"/>
+<text class="gwx" x="7255.0" y="571.0">X</text>
+<text class="qc" text-anchor="middle" x="7255.0" y="506.0">G9</text>
+<text class="q" text-anchor="middle" x="7255.0" y="519.0">Resolvido no</text>
+<text class="q" text-anchor="middle" x="7255.0" y="532.0">nível 1?</text>
+<g><title>5.3 — Suporte técnico (nível 2): erros, configuração, acessos; novo login</title><rect x="7346.0" y="684.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="7420" y="705.0">Nível 2: suporte</text><text class="t" x="7420" y="719.0">técnico e</text><text class="t" x="7420" y="733.0">novo login</text>
+<rect x="7352.0" y="676.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="7367.8" y="687.0">5.3</text>
+<g><title>Prazo: Solução em até 2 dias úteis</title><rect x="7382.0" y="750.0" width="62.0" height="16" rx="8" fill="#FBE7EF" stroke="#C2185B" stroke-width="0.8"/><text class="pill-t" x="7413.0" y="762.0" fill="#C2185B">⏱ 2 d.u.</text></g>
+<polygon class="gw" points="7585.0,694.0 7606.0,715.0 7585.0,736.0 7564.0,715.0"/>
+<text class="gwx" x="7585.0" y="721.0">X</text>
+<text class="qc" text-anchor="middle" x="7585.0" y="656.0">G10</text>
+<text class="q" text-anchor="middle" x="7585.0" y="669.0">Falha da</text>
+<text class="q" text-anchor="middle" x="7585.0" y="682.0">plataforma?</text>
+<g><title>5.4 — Acionar a Ludos (nível 3) e acompanhar até a solução</title><rect x="7676.0" y="684.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="7750" y="712.0">Nível 3: acionar</text><text class="t" x="7750" y="726.0">a Ludos e acompanhar</text>
+<rect x="7682.0" y="676.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="7697.8" y="687.0">5.4</text>
+<g><title>Prazo: Conforme contrato com a Ludos</title><rect x="7712.0" y="750.0" width="74.0" height="16" rx="8" fill="#FBE7EF" stroke="#C2185B" stroke-width="0.8"/><text class="pill-t" x="7749.0" y="762.0" fill="#C2185B">⏱ contrato</text></g>
+<g><title>5.5 — Facilitar encontros, rodas e lives com participantes e professores</title><rect x="7856.0" y="534.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="7930" y="562.0">Encontros, rodas</text><text class="t" x="7930" y="576.0">e lives</text>
+<rect x="7862.0" y="526.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="7877.8" y="537.0">5.5</text>
+<g><title>Prazo: A cada 15 dias</title><rect x="7892.0" y="600.0" width="104.0" height="16" rx="8" fill="#FFF1DF" stroke="#7A4300" stroke-width="0.8"/><text class="pill-t" x="7944.0" y="612.0" fill="#7A4300">⏱ 15 em 15 dias</text></g>
+<g><title>5.6 — Pontos de controle com professores e pontos focais</title><rect x="8036.0" y="534.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="8110" y="555.0">Pontos de controle</text><text class="t" x="8110" y="569.0">com professores e</text><text class="t" x="8110" y="583.0">pontos focais</text>
+<rect x="8042.0" y="526.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="8057.8" y="537.0">5.6</text>
+<g><title>Prazo: A cada 15 dias, alternando com os encontros</title><rect x="8072.0" y="600.0" width="104.0" height="16" rx="8" fill="#FFF1DF" stroke="#7A4300" stroke-width="0.8"/><text class="pill-t" x="8124.0" y="612.0" fill="#7A4300">⏱ 15 em 15 dias</text></g>
+<g><title>5.7 — Visitas às escolas e coleta de evidências (fotos, depoimentos)</title><rect x="8216.0" y="384.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="8290" y="405.0">Visitas às escolas</text><text class="t" x="8290" y="419.0">e coleta de</text><text class="t" x="8290" y="433.0">evidências</text>
+<rect x="8222.0" y="376.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="8237.8" y="387.0">5.7</text>
+<g><title>Prazo: 1 visita por escola por mês</title><rect x="8252.0" y="450.0" width="62.0" height="16" rx="8" fill="#FFF1DF" stroke="#7A4300" stroke-width="0.8"/><text class="pill-t" x="8283.0" y="462.0" fill="#7A4300">⏱ mensal</text></g>
+<g><title>6.1 — Monitorar uso e indicadores no banco de dados</title><rect x="8396.0" y="834.0" width="148" height="62" rx="10" fill="#FFF6D6" stroke="#B8860B" stroke-width="1.6"/></g>
+<text class="t" x="8470" y="862.0">Monitorar uso</text><text class="t" x="8470" y="876.0">e indicadores</text>
+<rect x="8402.0" y="826.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="8417.8" y="837.0">6.1</text>
+<g><title>Prazo: Toda semana, antes do relatório</title><rect x="8432.0" y="900.0" width="68.0" height="16" rx="8" fill="#FFF1DF" stroke="#7A4300" stroke-width="0.8"/><text class="pill-t" x="8466.0" y="912.0" fill="#7A4300">⏱ semanal</text></g>
+<polygon class="gw" points="8635.0,844.0 8656.0,865.0 8635.0,886.0 8614.0,865.0"/>
+<text class="gwx" x="8635.0" y="871.0">X</text>
+<text class="qc" text-anchor="middle" x="8635.0" y="806.0">G11</text>
+<text class="q" text-anchor="middle" x="8635.0" y="819.0">Dados</text>
+<text class="q" text-anchor="middle" x="8635.0" y="832.0">consistentes?</text>
+<g><title>6.2 — Consolidar dados, gerar relatório HTML e conferir lista de e-mails</title><rect x="8726.0" y="834.0" width="148" height="62" rx="10" fill="#FFF6D6" stroke="#B8860B" stroke-width="1.6"/></g>
+<text class="t" x="8800" y="862.0">Consolidar dados e</text><text class="t" x="8800" y="876.0">gerar relatório HTML</text>
+<rect x="8732.0" y="826.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="8747.8" y="837.0">6.2</text>
+<g><title>Prazo: Toda semana, antes do envio</title><rect x="8762.0" y="900.0" width="68.0" height="16" rx="8" fill="#FFF1DF" stroke="#7A4300" stroke-width="0.8"/><text class="pill-t" x="8796.0" y="912.0" fill="#7A4300">⏱ semanal</text></g>
+<g><title>6.3 — Enviar o relatório semanal e registrar o envio</title><rect x="8906.0" y="834.0" width="148" height="62" rx="10" fill="#FFF6D6" stroke="#B8860B" stroke-width="1.6"/></g>
+<text class="t" x="8980" y="855.0">Enviar o relatório</text><text class="t" x="8980" y="869.0">semanal e</text><text class="t" x="8980" y="883.0">registrar o envio</text>
+<rect x="8912.0" y="826.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="8927.8" y="837.0">6.3</text>
+<g><title>Prazo: Toda segunda-feira (a definir)</title><rect x="8942.0" y="900.0" width="98.0" height="16" rx="8" fill="#FFF1DF" stroke="#7A4300" stroke-width="0.8"/><text class="pill-t" x="8991.0" y="912.0" fill="#7A4300">⏱ toda segunda</text></g>
+<g><title>6.4 — Analisar indicadores por escola e turma</title><rect x="9086.0" y="534.0" width="148" height="62" rx="10" fill="#FFF6D6" stroke="#B8860B" stroke-width="1.6"/></g>
+<text class="t" x="9160" y="562.0">Analisar indicadores</text><text class="t" x="9160" y="576.0">por escola e turma</text>
+<rect x="9092.0" y="526.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="9107.8" y="537.0">6.4</text>
+<g><title>Prazo: Até 1 dia útil após o envio do relatório</title><rect x="9122.0" y="600.0" width="62.0" height="16" rx="8" fill="#FFF1DF" stroke="#7A4300" stroke-width="0.8"/><text class="pill-t" x="9153.0" y="612.0" fill="#7A4300">⏱ 1 d.u.</text></g>
+<polygon class="gw" points="9325.0,544.0 9346.0,565.0 9325.0,586.0 9304.0,565.0"/>
+<text class="gwx" x="9325.0" y="571.0">X</text>
+<text class="qc" text-anchor="middle" x="9325.0" y="603.0">G12</text>
+<text class="q" text-anchor="middle" x="9325.0" y="616.0">Baixo</text>
+<text class="q" text-anchor="middle" x="9325.0" y="629.0">engajamento?</text>
+<g><title>6.5 — Ação de reengajamento (contato, lembretes, apoio ao professor, encontro extra)</title><rect x="9416.0" y="534.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="9490" y="562.0">Ação de</text><text class="t" x="9490" y="576.0">reengajamento</text>
+<rect x="9422.0" y="526.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="9437.8" y="537.0">6.5</text>
+<g><title>Prazo: Até 5 dias úteis após o alerta</title><rect x="9452.0" y="600.0" width="62.0" height="16" rx="8" fill="#FBE7EF" stroke="#C2185B" stroke-width="0.8"/><text class="pill-t" x="9483.0" y="612.0" fill="#C2185B">⏱ 5 d.u.</text></g>
+<polygon class="gw" points="9655.0,544.0 9676.0,565.0 9655.0,586.0 9634.0,565.0"/>
+<text class="gwx" x="9655.0" y="571.0">X</text>
+<text class="qc" text-anchor="middle" x="9655.0" y="603.0">G13</text>
+<text class="q" text-anchor="middle" x="9655.0" y="616.0">Causa</text>
+<text class="q" text-anchor="middle" x="9655.0" y="629.0">institucional?</text>
+<g><title>6.6 — Acionar gestão escolar/secretaria</title><rect x="9746.0" y="384.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="9820" y="405.0">Acionar gestão</text><text class="t" x="9820" y="419.0">escolar ou</text><text class="t" x="9820" y="433.0">secretaria</text>
+<rect x="9752.0" y="376.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="9767.8" y="387.0">6.6</text>
+<g><title>Prazo: Até 3 dias úteis após identificar a causa</title><rect x="9782.0" y="450.0" width="62.0" height="16" rx="8" fill="#FBE7EF" stroke="#C2185B" stroke-width="0.8"/><text class="pill-t" x="9813.0" y="462.0" fill="#C2185B">⏱ 3 d.u.</text></g>
+<polygon class="gw" points="9985.0,244.0 10006.0,265.0 9985.0,286.0 9964.0,265.0"/>
+<text class="gwx" x="9985.0" y="271.0">X</text>
+<text class="qc" text-anchor="middle" x="9985.0" y="206.0">G14</text>
+<text class="q" text-anchor="middle" x="9985.0" y="219.0">Ciclo dentro</text>
+<text class="q" text-anchor="middle" x="9985.0" y="232.0">do cronograma?</text>
+<g><title>7.1 — Aplicar o questionário pós</title><rect x="10076.0" y="534.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="10150" y="562.0">Aplicar o</text><text class="t" x="10150" y="576.0">questionário pós</text>
+<rect x="10082.0" y="526.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="10097.8" y="537.0">7.1</text>
+<g><title>Prazo: Na última semana do ciclo</title><rect x="10112.0" y="600.0" width="104.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="10164.0" y="612.0" fill="#006C85">⏱ última semana</text></g>
+<g><title>7.2 — Fechar na plataforma: ranking final e conversão do Grana+</title><rect x="10256.0" y="684.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="10330" y="712.0">Fechar ranking</text><text class="t" x="10330" y="726.0">final e Grana+</text>
+<rect x="10262.0" y="676.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="10277.8" y="687.0">7.2</text>
+<g><title>Prazo: Até 3 dias úteis após o fim da trilha</title><rect x="10292.0" y="750.0" width="62.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="10323.0" y="762.0" fill="#006C85">⏱ 3 d.u.</text></g>
+<g><title>7.3 — Premiação, evento final e certificados</title><rect x="10436.0" y="684.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="10510" y="712.0">Premiação, evento</text><text class="t" x="10510" y="726.0">final e certificados</text>
+<rect x="10442.0" y="676.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="10457.8" y="687.0">7.3</text>
+<g><title>Prazo: Até 2 semanas após o fim da trilha</title><rect x="10472.0" y="750.0" width="80.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="10512.0" y="762.0" fill="#006C85">⏱ 2 semanas</text></g>
+<g><title>7.4 — Relatório final de impacto e prestação de contas</title><rect x="10616.0" y="234.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="10690" y="255.0">Relatório final de</text><text class="t" x="10690" y="269.0">impacto e prestação</text><text class="t" x="10690" y="283.0">de contas</text>
+<rect x="10622.0" y="226.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="10637.8" y="237.0">7.4</text>
+<g><title>Prazo: Até 30 dias após o encerramento</title><rect x="10652.0" y="300.0" width="68.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="10686.0" y="312.0" fill="#006C85">⏱ 30 dias</text></g>
+<g><title>7.5 — Devolutiva ao parceiro (resultados da escola/organização)</title><rect x="10796.0" y="384.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="10870" y="412.0">Devolutiva</text><text class="t" x="10870" y="426.0">ao parceiro</text>
+<rect x="10802.0" y="376.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="10817.8" y="387.0">7.5</text>
+<g><title>Prazo: Até 5 dias úteis após o relatório final</title><rect x="10832.0" y="450.0" width="62.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="10863.0" y="462.0" fill="#006C85">⏱ 5 d.u.</text></g>
+<g><title>7.6 — Registrar os aprendizados do ciclo</title><rect x="10976.0" y="234.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="11050" y="255.0">Registrar os</text><text class="t" x="11050" y="269.0">aprendizados</text><text class="t" x="11050" y="283.0">do ciclo</text>
+<rect x="10982.0" y="226.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="10997.8" y="237.0">7.6</text>
+<g><title>Prazo: Até 15 dias após o encerramento</title><rect x="11012.0" y="300.0" width="68.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="11046.0" y="312.0" fill="#006C85">⏱ 15 dias</text></g>
+<g><title>7.7 — Desativar acessos e tratar os dados ao final (LGPD)</title><rect x="11156.0" y="834.0" width="148" height="62" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="1.6"/></g>
+<text class="t" x="11230" y="855.0">Desativar acessos</text><text class="t" x="11230" y="869.0">e tratar os dados</text><text class="t" x="11230" y="883.0">(LGPD)</text>
+<rect x="11162.0" y="826.0" width="31.5" height="15" rx="7.5" fill="#F28C28"/><text class="code" x="11177.8" y="837.0">7.7</text>
+<g><title>Prazo: Até 60 dias após o encerramento</title><rect x="11192.0" y="900.0" width="68.0" height="16" rx="8" fill="#E3F6FA" stroke="#006C85" stroke-width="0.8"/><text class="pill-t" x="11226.0" y="912.0" fill="#006C85">⏱ 60 dias</text></g>
+<circle class="end" cx="11395.0" cy="265.0" r="16"/>
+<text class="qc" text-anchor="middle" x="11395.0" y="241.0">E1</text>
+<text class="ev" text-anchor="middle" x="11395.0" y="299.0">Encerramento</text>
+<text class="ev" text-anchor="middle" x="11395.0" y="312.0">do ciclo</text>
+<rect class="lbl-bg" x="1309.0" y="398.0" width="24.3" height="13" rx="2"/>
+<text class="lbl" x="1311.0" y="408.0">Não</text>
+<rect class="lbl-bg" x="1289.0" y="376.0" width="24.3" height="13" rx="2"/>
+<text class="lbl" x="1291.0" y="386.0">Sim</text>
+<rect class="lbl-bg" x="1639.0" y="398.0" width="24.3" height="13" rx="2"/>
+<text class="lbl" x="1641.0" y="408.0">Sim</text>
+<rect class="lbl-bg" x="1619.0" y="440.0" width="24.3" height="13" rx="2"/>
+<text class="lbl" x="1621.0" y="450.0">Não</text>
+<rect class="lbl-bg" x="2149.0" y="398.0" width="24.3" height="13" rx="2"/>
+<text class="lbl" x="2151.0" y="408.0">Sim</text>
+<rect class="lbl-bg" x="2129.0" y="376.0" width="73.1" height="13" rx="2"/>
+<text class="lbl" x="2131.0" y="386.0">Não: cobrar</text>
+<rect class="lbl-bg" x="2839.0" y="398.0" width="24.3" height="13" rx="2"/>
+<text class="lbl" x="2841.0" y="408.0">Sim</text>
+<rect class="lbl-bg" x="2819.0" y="376.0" width="176.8" height="13" rx="2"/>
+<text class="lbl" x="2821.0" y="386.0">Não: devolver com pendências</text>
+<rect class="lbl-bg" x="3829.0" y="698.0" width="24.3" height="13" rx="2"/>
+<text class="lbl" x="3831.0" y="708.0">Não</text>
+<rect class="lbl-bg" x="3809.0" y="676.0" width="24.3" height="13" rx="2"/>
+<text class="lbl" x="3811.0" y="686.0">Sim</text>
+<rect class="lbl-bg" x="4859.0" y="892.0" width="85.3" height="13" rx="2"/>
+<text class="lbl" x="4861.0" y="902.0">Sim: corrigir</text>
+<rect class="lbl-bg" x="4879.0" y="848.0" width="24.3" height="13" rx="2"/>
+<text class="lbl" x="4881.0" y="858.0">Não</text>
+<rect class="lbl-bg" x="5389.0" y="698.0" width="24.3" height="13" rx="2"/>
+<text class="lbl" x="5391.0" y="708.0">Sim</text>
+<rect class="lbl-bg" x="5369.0" y="742.0" width="79.2" height="13" rx="2"/>
+<text class="lbl" x="5371.0" y="752.0">Não: ajustar</text>
+<rect class="lbl-bg" x="5899.0" y="548.0" width="24.3" height="13" rx="2"/>
+<text class="lbl" x="5901.0" y="558.0">Sim</text>
+<rect class="lbl-bg" x="5879.0" y="526.0" width="24.3" height="13" rx="2"/>
+<text class="lbl" x="5881.0" y="536.0">Não</text>
+<rect class="lbl-bg" x="6929.0" y="1126.0" width="24.3" height="13" rx="2"/>
+<text class="lbl" x="6931.0" y="1136.0">Sim</text>
+<rect class="lbl-bg" x="6949.0" y="1148.0" width="24.3" height="13" rx="2"/>
+<text class="lbl" x="6951.0" y="1158.0">Não</text>
+<rect class="lbl-bg" x="7279.0" y="548.0" width="24.3" height="13" rx="2"/>
+<text class="lbl" x="7281.0" y="558.0">Não</text>
+<rect class="lbl-bg" x="7259.0" y="592.0" width="24.3" height="13" rx="2"/>
+<text class="lbl" x="7261.0" y="602.0">Sim</text>
+<rect class="lbl-bg" x="7609.0" y="698.0" width="24.3" height="13" rx="2"/>
+<text class="lbl" x="7611.0" y="708.0">Sim</text>
+<rect class="lbl-bg" x="7589.0" y="742.0" width="24.3" height="13" rx="2"/>
+<text class="lbl" x="7591.0" y="752.0">Não</text>
+<rect class="lbl-bg" x="8659.0" y="848.0" width="24.3" height="13" rx="2"/>
+<text class="lbl" x="8661.0" y="858.0">Sim</text>
+<rect class="lbl-bg" x="8639.0" y="892.0" width="91.4" height="13" rx="2"/>
+<text class="lbl" x="8641.0" y="902.0">Não: verificar</text>
+<rect class="lbl-bg" x="9349.0" y="548.0" width="24.3" height="13" rx="2"/>
+<text class="lbl" x="9351.0" y="558.0">Sim</text>
+<rect class="lbl-bg" x="9329.0" y="526.0" width="24.3" height="13" rx="2"/>
+<text class="lbl" x="9331.0" y="536.0">Não</text>
+<rect class="lbl-bg" x="9659.0" y="526.0" width="24.3" height="13" rx="2"/>
+<text class="lbl" x="9661.0" y="536.0">Sim</text>
+<rect class="lbl-bg" x="9679.0" y="548.0" width="24.3" height="13" rx="2"/>
+<text class="lbl" x="9681.0" y="558.0">Não</text>
+<rect class="lbl-bg" x="10009.0" y="248.0" width="24.3" height="13" rx="2"/>
+<text class="lbl" x="10011.0" y="258.0">Não</text>
+<rect class="lbl-bg" x="9989.0" y="292.0" width="121.9" height="13" rx="2"/>
+<text class="lbl" x="9991.0" y="302.0">Sim: próxima semana</text>
+</svg>
+  </div>
+
+  <div class="legend">
+    <div><svg width="22" height="22"><circle cx="11" cy="11" r="8" fill="#fff" stroke="#0A9F5A" stroke-width="2"/></svg>Início</div>
+    <div><svg width="22" height="22"><circle cx="11" cy="11" r="8" fill="#fff" stroke="#C2185B" stroke-width="4"/></svg>Fim</div>
+    <div><svg width="30" height="20"><rect x="1" y="2" width="28" height="16" rx="4" fill="#FAECE7" stroke="#D85A30" stroke-width="1.5"/></svg>Etapa nova</div>
+    <div><svg width="30" height="20"><rect x="1" y="2" width="28" height="16" rx="4" fill="#FFF6D6" stroke="#B8860B" stroke-width="1.5"/></svg>Etapa existente com dono ou regra ajustada</div>
+    <div><svg width="30" height="20"><rect x="1" y="2" width="28" height="16" rx="4" fill="#fff" stroke="#002364" stroke-width="1.5"/></svg>Etapa existente</div>
+    <div><svg width="22" height="22"><polygon points="11,1 21,11 11,21 1,11" fill="#F1EBFA" stroke="#7B5EA7" stroke-width="2"/></svg>Decisão (sim ou não)</div>
+    <div><svg width="22" height="22"><polygon points="11,1 21,11 11,21 1,11" fill="#fff" stroke="#002364" stroke-width="2"/><text x="11" y="16" font-size="14" text-anchor="middle" fill="#002364">+</text></svg>Etapas ao mesmo tempo</div>
+    <div><svg width="34" height="10"><line x1="1" y1="5" x2="33" y2="5" stroke="#C2185B" stroke-width="1.5" stroke-dasharray="5 3"/></svg>Volta para corrigir ou repetir</div>
+    <div><span class="sla-pill">⏱ prazo</span><span class="sla-pill wk">⏱ rotina</span><span class="sla-pill ev">⏱ quando acontece</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>2. Etapas do processo</h2>
+  <p class="sub">Cada etapa com o dono (raia), quem apoia e se ela é nova, ajustada ou já existia. As decisões aparecem em lilás.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>#</th><th style="width:90px">Tipo</th><th>Etapa</th><th style="width:150px">Dono</th><th style="width:200px">Apoio</th><th style="width:110px">Situação</th></tr></thead>
+    <tbody>
+<tr class="phase"><td colspan="6">0. Entrada e adesão</td></tr>
+<tr><td class="cod">E0</td><td>Evento de início</td><td>Novo ciclo: metas do ciclo definidas (nº de escolas/organizações e participantes)<div class="obs">Substitui o início &#x27;Novo parceiro&#x27;</div></td><td>Coordenação</td><td>Direção estratégica</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr><td class="cod">0.1</td><td>Tarefa</td><td>Prospectar escolas, ONGs e parceiros e apresentar o programa</td><td>Mobilização</td><td>Comunicação (materiais); Coordenação</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr><td class="cod">0.2</td><td>Tarefa</td><td>Alinhar a adesão: papéis, cronograma e requisitos (internet e laboratório)</td><td>Mobilização</td><td>Coordenação</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr><td class="cod">0.3</td><td>Tarefa</td><td>Definir o ponto focal da escola/organização</td><td>Mobilização</td><td>—</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr class="phase"><td colspan="6">1. Inscrição, formalização e listagem</td></tr>
+<tr><td class="cod">1.1</td><td>Tarefa</td><td>Enviar formulário de inscrição<div class="obs">BPMN: Gestão de Projetos</div></td><td>Mobilização</td><td>—</td><td><span class="st st-aj">Ajustado (dono)</span></td></tr>
+<tr><td class="cod">1.2</td><td>Tarefa</td><td>Preencher formulário de inscrição</td><td>Parceiro / Gestor escolar</td><td>Mobilização acompanha</td><td><span class="st st-ex">Existente</span></td></tr>
+<tr class="gwrow"><td class="cod">G1</td><td>Gateway</td><td>A escola tem internet e laboratório de informática?<div class="obs">Sim → 1.3. Não → 1.2a (antes: fim do fluxo)</div></td><td>Mobilização</td><td>Operação da Jornada (consultada)</td><td><span class="st st-aj">Ajustado</span></td></tr>
+<tr><td class="cod">1.2a</td><td>Tarefa</td><td>Sem infraestrutura: avaliar alternativa (modelo híbrido/material impresso) ou registrar o motivo e reavaliar no próximo ciclo</td><td>Mobilização</td><td>Coordenação decide</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr><td class="cod">1.3</td><td>Tarefa</td><td>Enviar formulário de formalização</td><td>Mobilização</td><td>—</td><td><span class="st st-aj">Ajustado (dono)</span></td></tr>
+<tr><td class="cod">1.4</td><td>Tarefa</td><td>Preencher e enviar formalização</td><td>Parceiro / Gestor escolar</td><td>—</td><td><span class="st st-ex">Existente</span></td></tr>
+<tr class="gwrow"><td class="cod">G2</td><td>Gateway</td><td>Formalização recebida?<div class="obs">Não → cobrar preenchimento. Sim → 1.5</div></td><td>Mobilização</td><td>—</td><td><span class="st st-ex">Existente</span></td></tr>
+<tr><td class="cod">1.5</td><td>Tarefa</td><td>Solicitar a listagem de participantes</td><td>Mobilização</td><td>—</td><td><span class="st st-aj">Ajustado (dono)</span></td></tr>
+<tr><td class="cod">1.6</td><td>Tarefa</td><td>Preencher e enviar a listagem</td><td>Parceiro / Gestor escolar</td><td>—</td><td><span class="st st-ex">Existente</span></td></tr>
+<tr><td class="cod">1.7</td><td>Tarefa</td><td>Conferir e validar a listagem</td><td>Mobilização</td><td>Dados (formato para a API)</td><td><span class="st st-aj">Ajustado (dono)</span></td></tr>
+<tr class="gwrow"><td class="cod">G3</td><td>Gateway</td><td>Dados completos?<div class="obs">Não → devolver com pendências. Sim → Fase 2</div></td><td>Mobilização</td><td>—</td><td><span class="st st-ex">Existente</span></td></tr>
+<tr class="phase"><td colspan="6">2. Planejamento do ciclo</td></tr>
+<tr><td class="cod">2.1</td><td>Tarefa</td><td>Montar o cronograma de execução da jornada (abertura, módulos, pré e pós, formações, encontros, encerramento)</td><td>Operação da Jornada</td><td>Acompanhamento; Coordenação aprova</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr><td class="cod">2.2</td><td>Tarefa</td><td>Revisar e atualizar conteúdos e manuais para o ciclo</td><td>Operação da Jornada</td><td>Metodologia valida</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr><td class="cod">2.3</td><td>Tarefa</td><td>Levantar orçamentos e contratar fornecedores do ciclo (facilitadores, kits, premiação, evento)</td><td>Operação da Jornada</td><td>Coordenação aprova</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr><td class="cod">2.4</td><td>Tarefa</td><td>Planejar a comunicação do ciclo (divulgação e peças de mobilização)</td><td>Comunicação</td><td>Mobilização; Coordenação</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr class="phase"><td colspan="6">3. Configuração da plataforma</td></tr>
+<tr class="gwrow"><td class="cod">G4</td><td>Gateway</td><td>O parceiro já tem curso?<div class="obs">Sim → usar curso existente. Não → G5</div></td><td>Operação da Jornada</td><td>—</td><td><span class="st st-aj">Ajustado (dono)</span></td></tr>
+<tr class="gwrow"><td class="cod">G5</td><td>Gateway</td><td>Qual curso-base: Escolas ou Participantes?</td><td>Operação da Jornada</td><td>Coordenação (se for novo tipo de parceiro)</td><td><span class="st st-aj">Ajustado (dono)</span></td></tr>
+<tr><td class="cod">3.1</td><td>Tarefa</td><td>Duplicar o curso-base e gerar novo ID<div class="obs">BPMN: Operações/TI</div></td><td>Operação da Jornada</td><td>Ludos (consultada)</td><td><span class="st st-aj">Ajustado (dono)</span></td></tr>
+<tr><td class="cod">3.2</td><td>Tarefa</td><td>Criar turmas, associar ao curso e configurar acessos dos gestores</td><td>Operação da Jornada</td><td>—</td><td><span class="st st-aj">Ajustado (dono)</span></td></tr>
+<tr><td class="cod">3.3</td><td>Tarefa</td><td>Configurar ranking, Roda de Apoio, boas-vindas e identidade visual</td><td>Operação da Jornada</td><td>Comunicação (identidade visual)</td><td><span class="st st-aj">Ajustado (dono)</span></td></tr>
+<tr><td class="cod">3.4</td><td>Tarefa</td><td>Configurar os questionários pré e pós na plataforma<div class="obs">Base da avaliação de impacto</div></td><td>Operação da Jornada</td><td>Coordenação e Metodologia (instrumentos)</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr><td class="cod">3.5</td><td>Tarefa</td><td>Cadastrar participantes via API e associar às turmas</td><td>Dados</td><td>—</td><td><span class="st st-aj">Ajustado (dono)</span></td></tr>
+<tr class="gwrow"><td class="cod">G6</td><td>Gateway</td><td>Inconsistências no retorno da API?<div class="obs">Sim → corrigir e refazer. Não → 3.6</div></td><td>Dados</td><td>—</td><td><span class="st st-ex">Existente</span></td></tr>
+<tr><td class="cod">3.6</td><td>Tarefa</td><td>Testar como usuário (jornada do aluno e do professor)</td><td>Acompanhamento</td><td>Operação da Jornada</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr><td class="cod">3.7</td><td>Tarefa</td><td>Conferência final, aprovar e liberar o curso<div class="obs">BPMN: Gestão de Projetos</div></td><td>Operação da Jornada</td><td>Coordenação (informada)</td><td><span class="st st-aj">Ajustado (dono)</span></td></tr>
+<tr class="gwrow"><td class="cod">G7</td><td>Gateway</td><td>Tudo funcionando?<div class="obs">Não → ajustar configuração. Sim → Fase 4</div></td><td>Operação da Jornada</td><td>—</td><td><span class="st st-ex">Existente</span></td></tr>
+<tr class="phase"><td colspan="6">4. Preparação</td></tr>
+<tr><td class="cod">4.1</td><td>Tarefa</td><td>Gerar os logins de educadores e participantes</td><td>Dados</td><td>—</td><td><span class="st st-aj">Ajustado (dono)</span></td></tr>
+<tr><td class="cod">4.2</td><td>Tarefa</td><td>Enviar os logins e a comunicação de acesso<div class="obs">Passagem Mobilização → Acompanhamento</div></td><td>Acompanhamento</td><td>Comunicação (texto)</td><td><span class="st st-aj">Ajustado (dono)</span></td></tr>
+<tr class="gwrow"><td class="cod">G8</td><td>Gateway</td><td>Problema de acesso?<div class="obs">Sim → resolver em níveis. Não → 4.3</div></td><td>Acompanhamento (nível 1)</td><td>Operação (nível 2); Dados (novo login)</td><td><span class="st st-aj">Ajustado</span></td></tr>
+<tr><td class="cod">4.3</td><td>Tarefa</td><td>Formação de professores e multiplicadores</td><td>Acompanhamento</td><td>Operação (apoio técnico); especialista externo</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr><td class="cod">4.4</td><td>Tarefa</td><td>Live de kick-off com parceiro, escolas e educadores<div class="obs">BPMN: Gestão de Projetos</div></td><td>Acompanhamento</td><td>Mobilização (convida); Comunicação (divulga)</td><td><span class="st st-aj">Ajustado (dono)</span></td></tr>
+<tr><td class="cod">4.5</td><td>Tarefa</td><td>Aplicar o questionário pré (linha de base)</td><td>Acompanhamento</td><td>Operação (configura); Dados (integra)</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr class="phase"><td colspan="6">5. Execução da trilha</td></tr>
+<tr><td class="cod">5.1</td><td>Tarefa</td><td>Realizar a trilha em sala</td><td>Educador / Participante</td><td>Acompanhamento acompanha</td><td><span class="st st-ex">Existente</span></td></tr>
+<tr><td class="cod">5.2</td><td>Tarefa</td><td>Atendimento na porta única (nível 1): dúvidas de uso, prazos, orientações<div class="obs">BPMN: suporte com Operações/TI</div></td><td>Acompanhamento</td><td>FAQ e tutoriais</td><td><span class="st st-aj">Ajustado (dono)</span></td></tr>
+<tr class="gwrow"><td class="cod">G9</td><td>Gateway</td><td>Resolvido no nível 1?<div class="obs">Não → 5.3</div></td><td>Acompanhamento</td><td>—</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr><td class="cod">5.3</td><td>Tarefa</td><td>Suporte técnico (nível 2): erros, configuração, acessos; novo login</td><td>Operação da Jornada</td><td>Dados (novo login)</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr class="gwrow"><td class="cod">G10</td><td>Gateway</td><td>Falha da plataforma?<div class="obs">Sim → 5.4</div></td><td>Operação da Jornada</td><td>—</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr><td class="cod">5.4</td><td>Tarefa</td><td>Acionar a Ludos (nível 3) e acompanhar até a solução</td><td>Operação da Jornada</td><td>Ludos</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr><td class="cod">5.5</td><td>Tarefa</td><td>Facilitar encontros, rodas e lives com participantes e professores<div class="obs">Ex.: grupo &#x27;Meu Caminho&#x27;</div></td><td>Acompanhamento</td><td>Especialistas externos (via Operação)</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr><td class="cod">5.6</td><td>Tarefa</td><td>Pontos de controle com professores e pontos focais</td><td>Acompanhamento</td><td>Mobilização</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr><td class="cod">5.7</td><td>Tarefa</td><td>Visitas às escolas e coleta de evidências (fotos, depoimentos)</td><td>Mobilização</td><td>Acompanhamento; Comunicação</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr class="phase"><td colspan="6">6. Monitoramento e relatórios semanais</td></tr>
+<tr><td class="cod">6.1</td><td>Tarefa</td><td>Monitorar uso e indicadores no banco de dados</td><td>Dados</td><td>—</td><td><span class="st st-aj">Ajustado (dono)</span></td></tr>
+<tr class="gwrow"><td class="cod">G11</td><td>Gateway</td><td>Dados consistentes?<div class="obs">Não → verificar. Sim → 6.2</div></td><td>Dados</td><td>Coordenação (fonte oficial única)</td><td><span class="st st-ex">Existente</span></td></tr>
+<tr><td class="cod">6.2</td><td>Tarefa</td><td>Consolidar dados, gerar relatório HTML e conferir lista de e-mails</td><td>Dados</td><td>Coordenação (define layout e conteúdo)</td><td><span class="st st-aj">Ajustado (dono)</span></td></tr>
+<tr><td class="cod">6.3</td><td>Tarefa</td><td>Enviar o relatório semanal e registrar o envio</td><td>Dados</td><td>—</td><td><span class="st st-aj">Ajustado (dono)</span></td></tr>
+<tr><td class="cod">6.4</td><td>Tarefa</td><td>Analisar indicadores por escola e turma<div class="obs">BPMN: Gestão de Projetos</div></td><td>Acompanhamento</td><td>Coordenação (visão de gestão)</td><td><span class="st st-aj">Ajustado (dono)</span></td></tr>
+<tr class="gwrow"><td class="cod">G12</td><td>Gateway</td><td>Turma ou escola com baixo engajamento?<div class="obs">Sim → 6.5. Não → G14</div></td><td>Acompanhamento</td><td>—</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr><td class="cod">6.5</td><td>Tarefa</td><td>Ação de reengajamento (contato, lembretes, apoio ao professor, encontro extra)</td><td>Acompanhamento</td><td>Comunicação</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr class="gwrow"><td class="cod">G13</td><td>Gateway</td><td>A causa é institucional (gestão ausente, resistência, mudança na secretaria)?<div class="obs">Sim → 6.6</div></td><td>Acompanhamento</td><td>—</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr><td class="cod">6.6</td><td>Tarefa</td><td>Acionar gestão escolar/secretaria</td><td>Mobilização</td><td>Coordenação</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr class="gwrow"><td class="cod">G14</td><td>Gateway</td><td>Ciclo dentro do período do cronograma?<div class="obs">Antes: &#x27;Projeto em execução?&#x27;. Sim → próxima semana (6.1). Não → Fase 7</div></td><td>Coordenação</td><td>—</td><td><span class="st st-aj">Ajustado</span></td></tr>
+<tr class="phase"><td colspan="6">7. Encerramento do ciclo</td></tr>
+<tr><td class="cod">7.1</td><td>Tarefa</td><td>Aplicar o questionário pós</td><td>Acompanhamento</td><td>Operação (configura); Dados (integra)</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr><td class="cod">7.2</td><td>Tarefa</td><td>Fechar na plataforma: ranking final e conversão do Grana+</td><td>Operação da Jornada</td><td>Dados</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr><td class="cod">7.3</td><td>Tarefa</td><td>Premiação, evento final e certificados</td><td>Operação da Jornada</td><td>Acompanhamento; Comunicação; Mobilização</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr><td class="cod">7.4</td><td>Tarefa</td><td>Relatório final de impacto e prestação de contas</td><td>Coordenação</td><td>Dados; Metodologia valida</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr><td class="cod">7.5</td><td>Tarefa</td><td>Devolutiva ao parceiro (resultados da escola/organização)</td><td>Coordenação</td><td>Mobilização</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr><td class="cod">7.6</td><td>Tarefa</td><td>Registrar os aprendizados do ciclo</td><td>Coordenação</td><td>Todas as posições</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr><td class="cod">7.7</td><td>Tarefa</td><td>Desativar acessos e tratar os dados ao final (LGPD)</td><td>Dados</td><td>Operação da Jornada</td><td><span class="st st-novo">Novo</span></td></tr>
+<tr><td class="cod">E1</td><td>Evento de fim</td><td>Encerramento do ciclo<div class="obs">Antes: &#x27;Encerramento do projeto&#x27;</div></td><td>Coordenação</td><td>—</td><td><span class="st st-aj">Ajustado</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Cursos-base disponíveis (decisão G5)</h3>
+  <p class="sub">Antes de duplicar o curso, ver qual curso-base corresponde à modalidade do parceiro.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th style="width:190px">Aspecto</th><th>Curso-base Escolas</th><th>Curso-base Participantes</th></tr></thead>
+    <tbody>
+      <tr><td><b>Jornada</b></td><td>Jornada gamificada</td><td>Jornada gamificada</td></tr>
+      <tr><td><b>Conteúdos, materiais e manuais</b></td><td>Próprios da modalidade Escolas</td><td>Próprios da modalidade Participantes</td></tr>
+      <tr><td><b>Premiação</b></td><td>Brindes</td><td>Grana+</td></tr>
+      <tr><td><b>Acesso e uso dos dados</b></td><td>Regras da modalidade Escolas</td><td>Regras da modalidade Participantes</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2>3. O que cada posição faz no fluxo</h2>
+  <p class="sub">Etapas que cada posição executa (R) e as que aprova (A), tiradas da matriz abaixo.</p>
+  <div class="roles">
+<div class="role"><h4>Coordenação</h4><ul><li>7.4 Relatório final de impacto e prestação de contas</li><li>7.6 Registrar os aprendizados do ciclo</li></ul><p class="role-ap"><b>Aprova o que outros executam:</b> 0.1, 0.2, 1.2a, 2.1, 2.3, 2.4, 3.4, 4.5, 7.1, 7.3, 7.5, 7.7</p></div>
+<div class="role"><h4>Mobilização</h4><ul><li>0.1 Prospectar escolas, ONGs e parceiros e apresentar o programa</li><li>0.2 Alinhar a adesão: papéis, cronograma e requisitos (internet e laboratório)</li><li>0.3 Definir o ponto focal da escola/organização</li><li>1.1 Enviar formulário de inscrição</li><li>1.2a Sem infraestrutura: avaliar alternativa (modelo híbrido/material impresso) ou registrar o motivo e reavaliar no próximo ciclo</li><li>1.3 Enviar formulário de formalização</li><li>1.5 Solicitar a listagem de participantes</li><li>1.7 Conferir e validar a listagem</li><li>5.7 Visitas às escolas e coleta de evidências (fotos, depoimentos)</li><li>6.6 Acionar gestão escolar/secretaria</li><li>7.5 Devolutiva ao parceiro (resultados da escola/organização)</li></ul><p class="role-ap"><b>Aprova o que outros executam:</b> 1.2, 1.4, 1.6</p></div>
+<div class="role"><h4>Acompanhamento e Facilitação</h4><ul><li>3.6 Testar como usuário (jornada do aluno e do professor)</li><li>4.2 Enviar os logins e a comunicação de acesso</li><li>4.3 Formação de professores e multiplicadores</li><li>4.4 Live de kick-off com parceiro, escolas e educadores</li><li>4.5 Aplicar o questionário pré (linha de base)</li><li>5.2 Atendimento na porta única (nível 1): dúvidas de uso, prazos, orientações</li><li>5.5 Facilitar encontros, rodas e lives com participantes e professores</li><li>5.6 Pontos de controle com professores e pontos focais</li><li>6.4 Analisar indicadores por escola e turma</li><li>6.5 Ação de reengajamento (contato, lembretes, apoio ao professor, encontro extra)</li><li>7.1 Aplicar o questionário pós</li></ul></div>
+<div class="role"><h4>Operação da Jornada</h4><ul><li>2.1 Montar o cronograma de execução da jornada (abertura, módulos, pré e pós, formações, encontros, encerramento)</li><li>2.2 Revisar e atualizar conteúdos e manuais para o ciclo</li><li>2.3 Levantar orçamentos e contratar fornecedores do ciclo (facilitadores, kits, premiação, evento)</li><li>3.1 Duplicar o curso-base e gerar novo ID</li><li>3.2 Criar turmas, associar ao curso e configurar acessos dos gestores</li><li>3.3 Configurar ranking, Roda de Apoio, boas-vindas e identidade visual</li><li>3.4 Configurar os questionários pré e pós na plataforma</li><li>3.7 Conferência final, aprovar e liberar o curso</li><li>5.3 Suporte técnico (nível 2): erros, configuração, acessos; novo login</li><li>5.4 Acionar a Ludos (nível 3) e acompanhar até a solução</li><li>7.2 Fechar na plataforma: ranking final e conversão do Grana+</li><li>7.3 Premiação, evento final e certificados</li></ul><p class="role-ap"><b>Aprova o que outros executam:</b> 3.6</p></div>
+<div class="role"><h4>Dados e Automação</h4><ul><li>3.5 Cadastrar participantes via API e associar às turmas</li><li>4.1 Gerar os logins de educadores e participantes</li><li>6.1 Monitorar uso e indicadores no banco de dados</li><li>6.2 Consolidar dados, gerar relatório HTML e conferir lista de e-mails</li><li>6.3 Enviar o relatório semanal e registrar o envio</li><li>7.7 Desativar acessos e tratar os dados ao final (LGPD)</li></ul></div>
+<div class="role"><h4>Comunicação</h4><ul><li>2.4 Planejar a comunicação do ciclo (divulgação e peças de mobilização)</li></ul></div>
+<div class="role"><h4>Metodologia</h4><ul><li><i>Não executa etapas; valida e é consultada.</i></li></ul><p class="role-ap"><b>Aprova o que outros executam:</b> 2.2</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>4. Quem faz o quê (matriz RACI)</h2>
+  <p class="sub">
+    <b class="R">R</b> Faz a etapa &nbsp;·&nbsp;
+    <b class="A">A</b> Aprova e responde pelo resultado &nbsp;·&nbsp;
+    <b class="C">C</b> É consultado &nbsp;·&nbsp;
+    <b class="I">I</b> É informado. Cada etapa tem um único A.
+  </p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>#</th><th style="min-width:240px">Etapa</th><th style="text-align:center">Coordenação</th><th style="text-align:center">Mobilização</th><th style="text-align:center">Acompanhamento e Facilitação</th><th style="text-align:center">Operação da Jornada</th><th style="text-align:center">Dados e Automação</th><th style="text-align:center">Comunicação</th><th style="text-align:center">Metodologia</th><th style="text-align:center">Parceiro / Gestor</th><th style="text-align:center">Educador</th><th style="text-align:center">Participante</th><th style="text-align:center">Ludos</th></tr></thead>
+    <tbody>
+<tr class="phase"><td colspan="13">0. Entrada e adesão</td></tr>
+<tr><td class="cod">E0</td><td>Novo ciclo: metas do ciclo definidas (nº de escolas/organizações e participantes)</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">0.1</td><td>Prospectar escolas, ONGs e parceiros e apresentar o programa</td><td class="c"><span class="A">A</span></td><td class="c"><span class="R">R</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">0.2</td><td>Alinhar a adesão: papéis, cronograma e requisitos (internet e laboratório)</td><td class="c"><span class="A">A</span></td><td class="c"><span class="R">R</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">0.3</td><td>Definir o ponto focal da escola/organização</td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr class="phase"><td colspan="13">1. Inscrição, formalização e listagem</td></tr>
+<tr><td class="cod">1.1</td><td>Enviar formulário de inscrição</td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">1.2</td><td>Preencher formulário de inscrição</td><td class="c">–</td><td class="c"><span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="R">R</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr class="gwrow"><td class="cod">G1</td><td>A escola tem internet e laboratório de informática?</td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">1.2a</td><td>Sem infraestrutura: avaliar alternativa (modelo híbrido/material impresso) ou registrar o motivo e reavaliar no próximo ciclo</td><td class="c"><span class="A">A</span></td><td class="c"><span class="R">R</span></td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">1.3</td><td>Enviar formulário de formalização</td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">1.4</td><td>Preencher e enviar formalização</td><td class="c">–</td><td class="c"><span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="R">R</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr class="gwrow"><td class="cod">G2</td><td>Formalização recebida?</td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">1.5</td><td>Solicitar a listagem de participantes</td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">1.6</td><td>Preencher e enviar a listagem</td><td class="c">–</td><td class="c"><span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c">–</td><td class="c"><span class="R">R</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">1.7</td><td>Conferir e validar a listagem</td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr class="gwrow"><td class="cod">G3</td><td>Dados completos?</td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr class="phase"><td colspan="13">2. Planejamento do ciclo</td></tr>
+<tr><td class="cod">2.1</td><td>Montar o cronograma de execução da jornada (abertura, módulos, pré e pós, formações, encontros, encerramento)</td><td class="c"><span class="A">A</span></td><td class="c"><span class="I">I</span></td><td class="c"><span class="C">C</span></td><td class="c"><span class="R">R</span></td><td class="c"><span class="I">I</span></td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">2.2</td><td>Revisar e atualizar conteúdos e manuais para o ciclo</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c"><span class="R">R</span></td><td class="c">–</td><td class="c">–</td><td class="c"><span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">2.3</td><td>Levantar orçamentos e contratar fornecedores do ciclo (facilitadores, kits, premiação, evento)</td><td class="c"><span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c"><span class="R">R</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">2.4</td><td>Planejar a comunicação do ciclo (divulgação e peças de mobilização)</td><td class="c"><span class="A">A</span></td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="R">R</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr class="phase"><td colspan="13">3. Configuração da plataforma</td></tr>
+<tr class="gwrow"><td class="cod">G4</td><td>O parceiro já tem curso?</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr class="gwrow"><td class="cod">G5</td><td>Qual curso-base: Escolas ou Participantes?</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">3.1</td><td>Duplicar o curso-base e gerar novo ID</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td></tr>
+<tr><td class="cod">3.2</td><td>Criar turmas, associar ao curso e configurar acessos dos gestores</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">3.3</td><td>Configurar ranking, Roda de Apoio, boas-vindas e identidade visual</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td></tr>
+<tr><td class="cod">3.4</td><td>Configurar os questionários pré e pós na plataforma</td><td class="c"><span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c"><span class="R">R</span></td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">3.5</td><td>Cadastrar participantes via API e associar às turmas</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td></tr>
+<tr class="gwrow"><td class="cod">G6</td><td>Inconsistências no retorno da API?</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">3.6</td><td>Testar como usuário (jornada do aluno e do professor)</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="R">R</span></td><td class="c"><span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">3.7</td><td>Conferência final, aprovar e liberar o curso</td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr class="gwrow"><td class="cod">G7</td><td>Tudo funcionando?</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr class="phase"><td colspan="13">4. Preparação</td></tr>
+<tr><td class="cod">4.1</td><td>Gerar os logins de educadores e participantes</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">4.2</td><td>Enviar os logins e a comunicação de acesso</td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c"><span class="I">I</span></td><td class="c">–</td></tr>
+<tr class="gwrow"><td class="cod">G8</td><td>Problema de acesso?</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="R">R</span></td><td class="c"><span class="A">A</span></td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">4.3</td><td>Formação de professores e multiplicadores</td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c"><span class="I">I</span></td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">4.4</td><td>Live de kick-off com parceiro, escolas e educadores</td><td class="c"><span class="I">I</span></td><td class="c"><span class="C">C</span></td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c"><span class="C">C</span></td><td class="c"><span class="I">I</span></td><td class="c">–</td></tr>
+<tr><td class="cod">4.5</td><td>Aplicar o questionário pré (linha de base)</td><td class="c"><span class="A">A</span></td><td class="c">–</td><td class="c"><span class="R">R</span></td><td class="c"><span class="C">C</span></td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td></tr>
+<tr class="phase"><td colspan="13">5. Execução da trilha</td></tr>
+<tr><td class="cod">5.1</td><td>Realizar a trilha em sala</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="A">A</span></td><td class="c"><span class="R">R</span></td><td class="c">–</td></tr>
+<tr><td class="cod">5.2</td><td>Atendimento na porta única (nível 1): dúvidas de uso, prazos, orientações</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c"><span class="C">C</span></td><td class="c">–</td></tr>
+<tr class="gwrow"><td class="cod">G9</td><td>Resolvido no nível 1?</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">5.3</td><td>Suporte técnico (nível 2): erros, configuração, acessos; novo login</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr class="gwrow"><td class="cod">G10</td><td>Falha da plataforma?</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">5.4</td><td>Acionar a Ludos (nível 3) e acompanhar até a solução</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="R">R</span></td></tr>
+<tr><td class="cod">5.5</td><td>Facilitar encontros, rodas e lives com participantes e professores</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c"><span class="C">C</span></td><td class="c">–</td></tr>
+<tr><td class="cod">5.6</td><td>Pontos de controle com professores e pontos focais</td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">5.7</td><td>Visitas às escolas e coleta de evidências (fotos, depoimentos)</td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr class="phase"><td colspan="13">6. Monitoramento e relatórios semanais</td></tr>
+<tr><td class="cod">6.1</td><td>Monitorar uso e indicadores no banco de dados</td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr class="gwrow"><td class="cod">G11</td><td>Dados consistentes?</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">6.2</td><td>Consolidar dados, gerar relatório HTML e conferir lista de e-mails</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">6.3</td><td>Enviar o relatório semanal e registrar o envio</td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">6.4</td><td>Analisar indicadores por escola e turma</td><td class="c"><span class="C">C</span></td><td class="c"><span class="I">I</span></td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr class="gwrow"><td class="cod">G12</td><td>Turma ou escola com baixo engajamento?</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">6.5</td><td>Ação de reengajamento (contato, lembretes, apoio ao professor, encontro extra)</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td></tr>
+<tr class="gwrow"><td class="cod">G13</td><td>A causa é institucional (gestão ausente, resistência, mudança na secretaria)?</td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">6.6</td><td>Acionar gestão escolar/secretaria</td><td class="c"><span class="I">I</span></td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr class="gwrow"><td class="cod">G14</td><td>Ciclo dentro do período do cronograma?</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr class="phase"><td colspan="13">7. Encerramento do ciclo</td></tr>
+<tr><td class="cod">7.1</td><td>Aplicar o questionário pós</td><td class="c"><span class="A">A</span></td><td class="c">–</td><td class="c"><span class="R">R</span></td><td class="c"><span class="C">C</span></td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td></tr>
+<tr><td class="cod">7.2</td><td>Fechar na plataforma: ranking final e conversão do Grana+</td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c">–</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">7.3</td><td>Premiação, evento final e certificados</td><td class="c"><span class="A">A</span></td><td class="c"><span class="C">C</span></td><td class="c"><span class="C">C</span></td><td class="c"><span class="R">R</span></td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c"><span class="I">I</span></td><td class="c"><span class="I">I</span></td><td class="c">–</td></tr>
+<tr><td class="cod">7.4</td><td>Relatório final de impacto e prestação de contas</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">7.5</td><td>Devolutiva ao parceiro (resultados da escola/organização)</td><td class="c"><span class="A">A</span></td><td class="c"><span class="R">R</span></td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="I">I</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">7.6</td><td>Registrar os aprendizados do ciclo</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c"><span class="C">C</span></td><td class="c"><span class="C">C</span></td><td class="c"><span class="C">C</span></td><td class="c"><span class="C">C</span></td><td class="c"><span class="C">C</span></td><td class="c"><span class="C">C</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td class="cod">7.7</td><td>Desativar acessos e tratar os dados ao final (LGPD)</td><td class="c"><span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td><td class="c"><span class="R">R</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c"><span class="C">C</span></td></tr>
+<tr><td class="cod">E1</td><td>Encerramento do ciclo</td><td class="c"><span class="R">R</span>/<span class="A">A</span></td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="sla">
+  <h2>5. Prazos</h2>
+  <p class="sub">
+    Prazos da planilha de SLA, completados com sugestões para as etapas que estavam sem prazo (marcadas com <span class="sug">sugestão</span>). Tudo ainda está para a equipe validar.
+  </p>
+
+  <h3>Prazo por etapa</h3>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>#</th><th>Etapa</th><th style="width:170px">Dono</th><th style="width:300px">Prazo</th></tr></thead>
+    <tbody>
+<tr class="phase"><td colspan="4">0. Entrada e adesão</td></tr>
+<tr><td class="cod">0.1</td><td>Prospectar escolas, ONGs e parceiros e apresentar o programa</td><td>Mobilização</td><td><span class="sla-pill ct">Contínuo, conforme metas do ciclo</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">0.2</td><td>Alinhar a adesão: papéis, cronograma e requisitos (internet e laboratório)</td><td>Mobilização</td><td><span class="sla-pill ">Até 5 dias úteis após o primeiro contato</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">0.3</td><td>Definir o ponto focal da escola/organização</td><td>Mobilização</td><td><span class="sla-pill ">Até 2 dias úteis após o alinhamento</span> <span class="sug">sugestão</span></td></tr>
+<tr class="phase"><td colspan="4">1. Inscrição, formalização e listagem</td></tr>
+<tr><td class="cod">1.1</td><td>Enviar formulário de inscrição</td><td>Mobilização</td><td><span class="sla-pill ">Até 1 dia útil após definir o ponto focal</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">1.2</td><td>Preencher formulário de inscrição</td><td>Parceiro / Gestor escolar</td><td><span class="sla-pill ">Até 5 dias úteis após receber o formulário</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">1.2a</td><td>Sem infraestrutura: avaliar alternativa (modelo híbrido/material impresso) ou registrar o motivo e reavaliar no próximo ciclo</td><td>Mobilização</td><td><span class="sla-pill ev">Até 5 dias úteis após identificar a falta de estrutura</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">1.3</td><td>Enviar formulário de formalização</td><td>Mobilização</td><td><span class="sla-pill ">Até 1 dia útil após confirmar a infraestrutura</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">1.4</td><td>Preencher e enviar formalização</td><td>Parceiro / Gestor escolar</td><td><span class="sla-pill ">Cobrar após 5 dias úteis sem retorno</span></td></tr>
+<tr><td class="cod">1.5</td><td>Solicitar a listagem de participantes</td><td>Mobilização</td><td><span class="sla-pill ">Até 1 dia útil após receber a formalização</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">1.6</td><td>Preencher e enviar a listagem</td><td>Parceiro / Gestor escolar</td><td><span class="sla-pill ">Até 5 dias úteis após o pedido</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">1.7</td><td>Conferir e validar a listagem</td><td>Mobilização</td><td><span class="sla-pill ">Até 2 dias úteis após o recebimento</span></td></tr>
+<tr class="phase"><td colspan="4">2. Planejamento do ciclo</td></tr>
+<tr><td class="cod">2.1</td><td>Montar o cronograma de execução da jornada (abertura, módulos, pré e pós, formações, encontros, encerramento)</td><td>Operação da Jornada</td><td><span class="sla-pill ">Até 30 dias antes do início do ciclo</span></td></tr>
+<tr><td class="cod">2.2</td><td>Revisar e atualizar conteúdos e manuais para o ciclo</td><td>Operação da Jornada</td><td><span class="sla-pill ">Até 10 dias úteis antes da formação</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">2.3</td><td>Levantar orçamentos e contratar fornecedores do ciclo (facilitadores, kits, premiação, evento)</td><td>Operação da Jornada</td><td><span class="sla-pill ">Até 15 dias antes da data de uso</span></td></tr>
+<tr><td class="cod">2.4</td><td>Planejar a comunicação do ciclo (divulgação e peças de mobilização)</td><td>Comunicação</td><td><span class="sla-pill ">Até 20 dias antes do início do ciclo</span> <span class="sug">sugestão</span></td></tr>
+<tr class="phase"><td colspan="4">3. Configuração da plataforma</td></tr>
+<tr><td class="cod">3.1</td><td>Duplicar o curso-base e gerar novo ID</td><td>Operação da Jornada</td><td><span class="sla-pill ">Até 3 dias úteis após o planejamento</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">3.2</td><td>Criar turmas, associar ao curso e configurar acessos dos gestores</td><td>Operação da Jornada</td><td><span class="sla-pill ">Até 3 dias úteis após o curso com ID</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">3.3</td><td>Configurar ranking, Roda de Apoio, boas-vindas e identidade visual</td><td>Operação da Jornada</td><td><span class="sla-pill ">Até 3 dias úteis após criar as turmas</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">3.4</td><td>Configurar os questionários pré e pós na plataforma</td><td>Operação da Jornada</td><td><span class="sla-pill ">Até 3 dias úteis após a configuração</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">3.5</td><td>Cadastrar participantes via API e associar às turmas</td><td>Dados</td><td><span class="sla-pill ">Até 2 dias úteis após a listagem validada</span></td></tr>
+<tr><td class="cod">3.6</td><td>Testar como usuário (jornada do aluno e do professor)</td><td>Acompanhamento</td><td><span class="sla-pill ">Até 2 dias úteis após o cadastro</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">3.7</td><td>Conferência final, aprovar e liberar o curso</td><td>Operação da Jornada</td><td><span class="sla-pill ">Até 5 dias úteis antes do início da trilha</span></td></tr>
+<tr class="phase"><td colspan="4">4. Preparação</td></tr>
+<tr><td class="cod">4.1</td><td>Gerar os logins de educadores e participantes</td><td>Dados</td><td><span class="sla-pill ">Até 1 dia útil após liberar o curso</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">4.2</td><td>Enviar os logins e a comunicação de acesso</td><td>Acompanhamento</td><td><span class="sla-pill ">Até 3 dias úteis antes do kick-off</span></td></tr>
+<tr><td class="cod">4.3</td><td>Formação de professores e multiplicadores</td><td>Acompanhamento</td><td><span class="sla-pill ">Antes do início da trilha</span></td></tr>
+<tr><td class="cod">4.4</td><td>Live de kick-off com parceiro, escolas e educadores</td><td>Acompanhamento</td><td><span class="sla-pill ">No início da trilha</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">4.5</td><td>Aplicar o questionário pré (linha de base)</td><td>Acompanhamento</td><td><span class="sla-pill ">Na 1ª semana da trilha</span> <span class="sug">sugestão</span></td></tr>
+<tr class="phase"><td colspan="4">5. Execução da trilha</td></tr>
+<tr><td class="cod">5.1</td><td>Realizar a trilha em sala</td><td>Educador / Participante</td><td><span class="sla-pill ">Durante todo o ciclo</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">5.2</td><td>Atendimento na porta única (nível 1): dúvidas de uso, prazos, orientações</td><td>Acompanhamento</td><td><span class="sla-pill ev">Resposta em até 1 dia útil</span></td></tr>
+<tr><td class="cod">5.3</td><td>Suporte técnico (nível 2): erros, configuração, acessos; novo login</td><td>Operação da Jornada</td><td><span class="sla-pill ev">Solução em até 2 dias úteis</span></td></tr>
+<tr><td class="cod">5.4</td><td>Acionar a Ludos (nível 3) e acompanhar até a solução</td><td>Operação da Jornada</td><td><span class="sla-pill ev">Conforme contrato com a Ludos</span></td></tr>
+<tr><td class="cod">5.5</td><td>Facilitar encontros, rodas e lives com participantes e professores</td><td>Acompanhamento</td><td><span class="sla-pill wk">A cada 15 dias</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">5.6</td><td>Pontos de controle com professores e pontos focais</td><td>Acompanhamento</td><td><span class="sla-pill wk">A cada 15 dias, alternando com os encontros</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">5.7</td><td>Visitas às escolas e coleta de evidências (fotos, depoimentos)</td><td>Mobilização</td><td><span class="sla-pill wk">1 visita por escola por mês</span> <span class="sug">sugestão</span></td></tr>
+<tr class="phase"><td colspan="4">6. Monitoramento e relatórios semanais</td></tr>
+<tr><td class="cod">6.1</td><td>Monitorar uso e indicadores no banco de dados</td><td>Dados</td><td><span class="sla-pill wk">Toda semana, antes do relatório</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">6.2</td><td>Consolidar dados, gerar relatório HTML e conferir lista de e-mails</td><td>Dados</td><td><span class="sla-pill wk">Toda semana, antes do envio</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">6.3</td><td>Enviar o relatório semanal e registrar o envio</td><td>Dados</td><td><span class="sla-pill wk">Toda segunda-feira (a definir)</span></td></tr>
+<tr><td class="cod">6.4</td><td>Analisar indicadores por escola e turma</td><td>Acompanhamento</td><td><span class="sla-pill wk">Até 1 dia útil após o envio do relatório</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">6.5</td><td>Ação de reengajamento (contato, lembretes, apoio ao professor, encontro extra)</td><td>Acompanhamento</td><td><span class="sla-pill ev">Até 5 dias úteis após o alerta</span></td></tr>
+<tr><td class="cod">6.6</td><td>Acionar gestão escolar/secretaria</td><td>Mobilização</td><td><span class="sla-pill ev">Até 3 dias úteis após identificar a causa</span> <span class="sug">sugestão</span></td></tr>
+<tr class="phase"><td colspan="4">7. Encerramento do ciclo</td></tr>
+<tr><td class="cod">7.1</td><td>Aplicar o questionário pós</td><td>Acompanhamento</td><td><span class="sla-pill ">Na última semana do ciclo</span></td></tr>
+<tr><td class="cod">7.2</td><td>Fechar na plataforma: ranking final e conversão do Grana+</td><td>Operação da Jornada</td><td><span class="sla-pill ">Até 3 dias úteis após o fim da trilha</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">7.3</td><td>Premiação, evento final e certificados</td><td>Operação da Jornada</td><td><span class="sla-pill ">Até 2 semanas após o fim da trilha</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">7.4</td><td>Relatório final de impacto e prestação de contas</td><td>Coordenação</td><td><span class="sla-pill ">Até 30 dias após o encerramento</span></td></tr>
+<tr><td class="cod">7.5</td><td>Devolutiva ao parceiro (resultados da escola/organização)</td><td>Coordenação</td><td><span class="sla-pill ">Até 5 dias úteis após o relatório final</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">7.6</td><td>Registrar os aprendizados do ciclo</td><td>Coordenação</td><td><span class="sla-pill ">Até 15 dias após o encerramento</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">7.7</td><td>Desativar acessos e tratar os dados ao final (LGPD)</td><td>Dados</td><td><span class="sla-pill ">Até 60 dias após o encerramento</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Prazos das voltas (quando a decisão manda corrigir ou repetir)</h3>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>#</th><th style="width:260px">Decisão</th><th>O que acontece</th><th style="width:180px">Quem faz</th><th style="width:230px">Prazo</th></tr></thead>
+    <tbody>
+<tr><td class="cod">G1</td><td><b>A escola tem internet e laboratório de informática?</b> Não</td><td>Avaliar alternativa (modelo híbrido ou material impresso) ou registrar o motivo e reavaliar no próximo ciclo</td><td>Mobilização (Coordenação decide)</td><td><span class="sla-pill ev">5 dias úteis</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">G2</td><td><b>Formalização recebida?</b> Não</td><td>Cobrar o preenchimento da formalização</td><td>Mobilização</td><td><span class="sla-pill ev">Após 5 dias úteis sem retorno</span></td></tr>
+<tr><td class="cod">G3</td><td><b>Dados completos?</b> Não</td><td>Parceiro corrige as pendências da listagem</td><td>Parceiro (Mobilização cobra)</td><td><span class="sla-pill ev">Até 3 dias úteis</span></td></tr>
+<tr><td class="cod">G6</td><td><b>Inconsistências no retorno da API?</b> Sim</td><td>Corrigir os cadastros e refazer</td><td>Dados e Automação</td><td><span class="sla-pill ev">1 dia útil</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">G7</td><td><b>Tudo funcionando?</b> Não</td><td>Ajustar a configuração e conferir de novo</td><td>Operação da Jornada</td><td><span class="sla-pill ev">2 dias úteis</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">G8</td><td><b>Problema de acesso?</b> Sim</td><td>Resolver o acesso em níveis (Acompanhamento, Operação ou novo login por Dados)</td><td>Acompanhamento e Facilitação</td><td><span class="sla-pill ev">1 dia útil</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">G9</td><td><b>Resolvido no nível 1?</b> Não</td><td>Passar para o suporte técnico (nível 2)</td><td>Operação da Jornada</td><td><span class="sla-pill ev">Até 2 dias úteis</span></td></tr>
+<tr><td class="cod">G10</td><td><b>Falha da plataforma?</b> Sim</td><td>Acionar a Ludos (nível 3) e acompanhar</td><td>Operação da Jornada</td><td><span class="sla-pill ev">Conforme contrato</span></td></tr>
+<tr><td class="cod">G11</td><td><b>Dados consistentes?</b> Não</td><td>Verificar os dados antes do relatório</td><td>Dados e Automação</td><td><span class="sla-pill ev">1 dia útil</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">G12</td><td><b>Turma ou escola com baixo engajamento?</b> Sim</td><td>Ação de reengajamento</td><td>Acompanhamento e Facilitação</td><td><span class="sla-pill ev">Até 5 dias úteis após o alerta</span></td></tr>
+<tr><td class="cod">G13</td><td><b>A causa é institucional (gestão ausente, resistência, mudança na secretaria)?</b> Sim</td><td>Acionar gestão escolar ou secretaria</td><td>Mobilização</td><td><span class="sla-pill ev">3 dias úteis</span> <span class="sug">sugestão</span></td></tr>
+<tr><td class="cod">G14</td><td><b>Ciclo dentro do período do cronograma?</b> Sim</td><td>Repetir o ciclo de monitoramento na próxima semana</td><td>Dados e Automação</td><td><span class="sla-pill ev">Próxima segunda</span> <span class="sug">sugestão</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Calendário do ciclo</h3>
+  <p class="sub">Informe o início da trilha e a duração. As datas-limite saem dos prazos acima. O kick-off é considerado no primeiro dia da trilha.</p>
+  <noscript><p class="note">O calendário precisa de JavaScript ativado no navegador.</p></noscript>
+  <div class="sim">
+    <label>Início da trilha <input type="date" id="simInicio"></label>
+    <label>Duração da trilha (semanas) <input type="number" id="simSemanas" min="1" max="40" value="8"></label>
+    <label>Feriados (dd/mm/aaaa, separados por vírgula) <input type="text" id="simFeriados" placeholder="ex.: 15/11/2026, 25/12/2026"></label>
+  </div>
+  <div class="kpis" id="simKpis"></div>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>#</th><th>Marco</th><th style="width:190px">Dono</th><th style="width:220px">Regra</th><th style="width:140px">Data-limite</th></tr></thead>
+    <tbody id="simBody"></tbody>
+  </table>
+  </div>
+  <p class="note">Prazos em dias úteis pulam sábados, domingos e os feriados informados. Prazos em dias corridos (D−30, 30 dias, 60 dias) contam todos os dias. Datas que caem em fim de semana ou feriado são antecipadas para o dia útil anterior.</p>
+</section>
+
+</main>
+
+<script>
+/* Calendário do ciclo: datas-limite a partir do início da trilha */
+const MARCOS = [
+  {fase:"Antes do ciclo"},
+  {cod:"2.1", nome:"Cronograma de execução pronto", dono:"Operação da Jornada", regra:"30 dias antes do início", f:(c)=>corridos(c.ini,-30)},
+  {cod:"2.4", nome:"Plano de comunicação pronto", dono:"Comunicação", regra:"20 dias antes do início", f:(c)=>corridos(c.ini,-20), sug:true},
+  {cod:"2.3", nome:"Fornecedores do evento final contratados", dono:"Operação da Jornada", regra:"15 dias antes do evento final", f:(c)=>corridos(c.evento,-15)},
+  {cod:"3.7", nome:"Curso liberado", dono:"Operação da Jornada", regra:"5 dias úteis antes do início", f:(c)=>du(c.ini,-5)},
+  {cod:"4.2", nome:"Logins enviados", dono:"Acompanhamento e Facilitação", regra:"3 dias úteis antes do kick-off", f:(c)=>du(c.ini,-3)},
+  {cod:"4.3", nome:"Formação de professores concluída", dono:"Acompanhamento e Facilitação", regra:"Antes do início da trilha", f:(c)=>du(c.ini,-1)},
+  {fase:"Durante o ciclo"},
+  {cod:"4.4", nome:"Live de kick-off", dono:"Acompanhamento e Facilitação", regra:"No início da trilha", f:(c)=>c.ini, sug:true},
+  {cod:"4.5", nome:"Questionário pré aplicado", dono:"Acompanhamento e Facilitação", regra:"Na 1ª semana", f:(c)=>du(c.ini,4), sug:true},
+  {cod:"6.3", nome:"1º relatório semanal", dono:"Dados e Automação", regra:"Toda segunda-feira", f:(c)=>proxSegunda(c.ini)},
+  {cod:"7.1", nome:"Questionário pós aplicado", dono:"Acompanhamento e Facilitação", regra:"Na última semana", f:(c)=>c.fim},
+  {cod:"",    nome:"Fim da trilha", dono:"Coordenação", regra:"Início + duração", f:(c)=>c.fim},
+  {fase:"Depois do ciclo"},
+  {cod:"7.2", nome:"Ranking final e Grana+ fechados", dono:"Operação da Jornada", regra:"3 dias úteis após o fim", f:(c)=>du(c.fim,3), sug:true},
+  {cod:"7.3", nome:"Premiação e evento final", dono:"Operação da Jornada", regra:"Até 2 semanas após o fim", f:(c)=>c.evento, sug:true},
+  {cod:"7.6", nome:"Aprendizados do ciclo registrados", dono:"Coordenação", regra:"15 dias após o encerramento", f:(c)=>corridos(c.fim,15), sug:true},
+  {cod:"7.4", nome:"Relatório final de impacto", dono:"Coordenação", regra:"30 dias após o encerramento", f:(c)=>corridos(c.fim,30)},
+  {cod:"7.5", nome:"Devolutiva ao parceiro", dono:"Mobilização (Coordenação aprova)", regra:"5 dias úteis após o relatório final", f:(c)=>du(corridos(c.fim,30),5), sug:true},
+  {cod:"7.7", nome:"Acessos desativados e dados tratados (LGPD)", dono:"Dados e Automação", regra:"60 dias após o encerramento", f:(c)=>corridos(c.fim,60)}
+];
+
+const DIAS=["dom","seg","ter","qua","qui","sex","sáb"];
+let FER=new Set();
+function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function fmt(d){return DIAS[d.getDay()]+", "+String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear();}
+function util(d){return d.getDay()!==0&&d.getDay()!==6&&!FER.has(iso(d));}
+function du(d,n){const r=new Date(d),s=n<0?-1:1;n=Math.abs(n);while(n>0){r.setDate(r.getDate()+s);if(util(r))n--;}return r;}
+function antUtil(d){const r=new Date(d);while(!util(r))r.setDate(r.getDate()-1);return r;}
+function proxUtil(d){const r=new Date(d);while(!util(r))r.setDate(r.getDate()+1);return r;}
+function corridos(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return antUtil(r);}
+function proxSegunda(d){const r=new Date(d);r.setDate(r.getDate()+(((8-r.getDay())%7)||7));return proxUtil(r);}
+function lerFeriados(){
+  FER=new Set();
+  document.getElementById("simFeriados").value.split(",").forEach(s=>{
+    const m=s.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if(m) FER.add(m[3]+"-"+m[2].padStart(2,"0")+"-"+m[1].padStart(2,"0"));
+  });
+}
+function simular(){
+  const v=document.getElementById("simInicio").value; if(!v)return;
+  lerFeriados();
+  const [y,m,d]=v.split("-").map(Number);
+  const semanas=Math.max(1,parseInt(document.getElementById("simSemanas").value||"8",10));
+  const ini=proxUtil(new Date(y,m-1,d));
+  const fim=du(ini,semanas*5-1);
+  const evento=du(fim,10);
+  const c={ini,fim,evento}, k={};
+  const rows=MARCOS.map(x=>{
+    if(x.fase) return `<tr class="phase"><td colspan="5">${x.fase}</td></tr>`;
+    const dt=x.f(c); k[x.cod||"fim"]=dt;
+    const sug=x.sug?' <span class="sug">sugestão</span>':'';
+    return `<tr><td class="cod">${x.cod}</td><td>${x.nome}</td><td>${x.dono}</td><td>${x.regra}${sug}</td><td class="d">${fmt(dt)}</td></tr>`;
+  });
+  document.getElementById("simBody").innerHTML=rows.join("");
+  document.getElementById("simKpis").innerHTML=`
+    <div class="kpi"><span>Cronograma pronto</span><b>${fmt(k["2.1"])}</b></div>
+    <div class="kpi"><span>Curso liberado</span><b>${fmt(k["3.7"])}</b></div>
+    <div class="kpi hl"><span>Kick-off e início</span><b>${fmt(ini)}</b></div>
+    <div class="kpi"><span>Fim da trilha</span><b>${fmt(fim)}</b></div>
+    <div class="kpi"><span>Relatório final de impacto</span><b>${fmt(k["7.4"])}</b></div>
+    <div class="kpi hl"><span>Acessos desativados</span><b>${fmt(k["7.7"])}</b></div>`;
+}
+(function(){
+  const h=proxSegunda(new Date(Date.now()+42*864e5));
+  document.getElementById("simInicio").value=iso(h);
+  ["simInicio","simFeriados","simSemanas"].forEach(id=>{
+    const el=document.getElementById(id);
+    el.addEventListener("input",simular); el.addEventListener("change",simular);
+  });
+  simular();
+  const dg=document.getElementById("diagram"), a=document.getElementById("btnReal"), b=document.getElementById("btnFit");
+  a.addEventListener("click",()=>{dg.classList.remove("fit");a.classList.add("on");b.classList.remove("on");});
+  b.addEventListener("click",()=>{dg.classList.add("fit");b.classList.add("on");a.classList.remove("on");});
+})();
+</script>
+</body>
+</html>
