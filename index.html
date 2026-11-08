@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fluxo dos processos do Saldo+</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23002364'/%3E%3Ctext x='29' y='44' font-family='Arial,sans-serif' font-size='34' font-weight='700' fill='%23ffffff' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='48' y='30' font-family='Arial,sans-serif' font-size='26' font-weight='700' fill='%23F28C28' text-anchor='middle'%3E+%3C/text%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -87,6 +88,9 @@
   td.cod { font-weight: 600; color: var(--navy); white-space: nowrap; width: 52px; }
   tr.gwrow td { background: #F6F1FC !important; }
   tr.prox td { background: #FFF6EC !important; }
+  tr.dashrow td { background: #EAF8FB !important; }
+  tr.dashrow td.cod { color: #006C85; }
+  .kpi.dash { background: #EAF8FB; box-shadow: inset 0 0 0 2px var(--cyan); }
   .obs { font-size: 12px; color: var(--muted); margin-top: 3px; }
   .st { font-size: 11.5px; font-weight: 600; border-radius: 999px; padding: 2px 9px; white-space: nowrap; display: inline-block; }
   .st-novo { background: #FAECE7; color: #A8431F; } .st-aj { background: #FFF6D6; color: #7A5A00; } .st-ex { background: #EEF1F5; color: var(--muted); }
@@ -130,7 +134,7 @@
 
 <section>
   <h2>Datas de cada marco</h2>
-  <p class="sub">A linha em laranja é o próximo marco a partir de hoje.</p>
+  <p class="sub">A linha em laranja é o próximo marco a partir de hoje. As linhas em azul (D1, D2…) são os dashboards, feitos a cada 30 dias contados do início da trilha.</p>
   <div class="table-wrap">
   <table>
     <thead><tr><th>#</th><th>Marco</th><th style="width:190px">Dono</th><th style="width:220px">Regra</th><th style="width:150px">Data-limite</th><th style="width:120px">Situação</th></tr></thead>
@@ -1084,14 +1088,28 @@ function simular(){
   const fim=du(ini,semanas*5-1);
   const evento=du(fim,10);
   const c={ini,fim,evento}, k={};
-  // calcula todas as datas e acha o próximo marco
-  const lista=MARCOS.map(x=>x.fase?x:Object.assign({},x,{dt:x.f(c)}));
+  // calcula todas as datas
+  const base=MARCOS.map(x=>x.fase?x:Object.assign({},x,{dt:x.f(c)}));
+  // dashboards: a cada 30 dias a partir do início da trilha, até o fim do ciclo
+  const dashes=[];
+  for(let i=1;;i++){
+    const dt=corridos(ini,30*i);
+    if(dt>fim) break;
+    dashes.push({cod:"D"+i, nome:`Dashboard ${i} do ciclo`, dono:"Dados e Automação", regra:`A cada 30 dias (dia ${30*i} da trilha)`, dt, dash:true});
+  }
+  // encaixa os dashboards no bloco "Durante o ciclo", em ordem de data
+  const iDur=base.findIndex(x=>x.fase==="Durante o ciclo");
+  const iDep=base.findIndex(x=>x.fase==="Depois do ciclo");
+  const durante=base.slice(iDur+1,iDep).concat(dashes).sort((a,b)=>a.dt-b.dt);
+  const lista=base.slice(0,iDur+1).concat(durante, base.slice(iDep));
+  k.dash=dashes;
+  // acha o próximo marco
   let prox=null;
-  lista.forEach(x=>{ if(!x.fase){ k[x.cod||"fim"]=x.dt; if(faltam(x.dt)>=0 && (!prox || x.dt<prox.dt)) prox=x; }});
+  lista.forEach(x=>{ if(!x.fase){ if(!x.dash) k[x.cod||"fim"]=x.dt; if(faltam(x.dt)>=0 && (!prox || x.dt<prox.dt)) prox=x; }});
   const rows=lista.map(x=>{
     if(x.fase) return `<tr class="phase"><td colspan="6">${x.fase}</td></tr>`;
     const sug=x.sug?' <span class="sug">sugestão</span>':'';
-    const cls=(x===prox)?' class="prox"':'';
+    const cls=(x===prox)?' class="prox"':(x.dash?' class="dashrow"':'');
     return `<tr${cls}><td class="cod">${x.cod}</td><td>${x.nome}</td><td>${x.dono}</td><td>${x.regra}${sug}</td><td class="d">${fmt(x.dt)}</td><td>${situacao(faltam(x.dt))}</td></tr>`;
   });
   document.getElementById("simBody").innerHTML=rows.join("");
@@ -1102,6 +1120,7 @@ function simular(){
     <div class="kpi"><span>Cronograma pronto</span><b>${fmt(k["2.1"])}</b></div>
     <div class="kpi"><span>Curso liberado</span><b>${fmt(k["3.7"])}</b></div>
     <div class="kpi hl"><span>Kick-off e início</span><b>${fmt(ini)}</b></div>
+    <div class="kpi dash"><span>Dashboards no ciclo (a cada 30 dias)</span><b>${k.dash.length ? k.dash.length + (k.dash.length>1?" dashboards":" dashboard") : "Nenhum"}</b><small>${k.dash.length ? "1º em " + fmt(k.dash[0].dt) : "Trilha com menos de 30 dias"}</small></div>
     <div class="kpi"><span>Fim da trilha</span><b>${fmt(fim)}</b></div>
     <div class="kpi"><span>Relatório final de impacto</span><b>${fmt(k["7.4"])}</b></div>
     <div class="kpi"><span>Acessos desativados</span><b>${fmt(k["7.7"])}</b></div>`;
