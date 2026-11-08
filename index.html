@@ -12,9 +12,21 @@
   }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: "Poppins", Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
-  header { background: var(--navy); color: #fff; padding: 28px 32px; }
+  header { background: var(--navy); color: #fff; padding: 28px 32px 18px; }
   header h1 { margin: 0 0 4px; font-size: 24px; font-weight: 600; }
   header p { margin: 0; opacity: .85; font-size: 14px; }
+
+  /* Abas */
+  .tabs { position: sticky; top: 0; z-index: 20; background: var(--navy); padding: 0 24px; display: flex; gap: 4px; overflow-x: auto; border-bottom: 3px solid var(--orange); }
+  .tabs button { font-family: inherit; font-size: 13px; font-weight: 500; color: #C9D4EC; background: transparent; border: none; padding: 12px 16px; cursor: pointer; white-space: nowrap; border-radius: 8px 8px 0 0; }
+  .tabs button:hover { color: #fff; background: rgba(255,255,255,.08); }
+  .tabs button.on { color: var(--navy); background: var(--bg); font-weight: 600; }
+  .tabs button.cal { color: #fff; }
+  .tabs button.cal::before { content: "📅 "; }
+  .tabs button.cal.on { color: var(--navy); }
+  .tab { display: none; }
+  .tab.on { display: block; }
+
   main { max-width: 1280px; margin: 0 auto; padding: 24px 16px 48px; }
   section { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
   h2 { margin: 0 0 6px; font-size: 18px; color: var(--navy); font-weight: 600; }
@@ -23,7 +35,7 @@
   .steps { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
   .steps span { font-size: 12px; font-weight: 500; padding: 6px 12px; border-radius: 999px; background: #E8EEF9; color: var(--navy); }
   .steps span b { color: var(--orange); margin-right: 4px; }
-  .diagram { overflow: auto; border: 1px solid var(--line); border-radius: 8px; background: #fff; max-height: 82vh; }
+  .diagram { overflow: auto; border: 1px solid var(--line); border-radius: 8px; background: #fff; max-height: 78vh; }
   .diagram svg { display: block; }
   .diagram.fit svg { width: 100%; height: auto; }
   .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
@@ -52,34 +64,35 @@
   .sla-pill.wk { color: #7A4300; background: #FFF1DF; }
   .sla-pill.ev { color: var(--magenta); background: #FBE7EF; }
   .sla-pill.ct { color: var(--muted); background: #EEF1F5; }
-  .sim { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: flex-end; background: #F8FAFD; border: 1px solid var(--line); border-radius: 8px; padding: 14px; margin-bottom: 16px; }
-  .sim label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 500; color: var(--navy); }
-  .sim label.chk { flex-direction: row; align-items: center; gap: 8px; padding-bottom: 8px; }
-  .sim input[type=date], .sim input[type=text], .sim input[type=number] { font-family: inherit; font-size: 13px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--text); }
-  .sim input[type=text] { min-width: 240px; }
+
+  /* Calendário */
+  .cal-hero { background: linear-gradient(135deg, var(--navy), #0B3A8C); color: #fff; border: none; }
+  .cal-hero h2 { color: #fff; font-size: 20px; }
+  .cal-hero .sub { color: #C9D4EC; }
+  .sim { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: flex-end; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.2); border-radius: 10px; padding: 16px; margin-bottom: 18px; }
+  .sim label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 500; color: #fff; }
+  .sim input[type=date], .sim input[type=text], .sim input[type=number] { font-family: inherit; font-size: 14px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--text); }
+  .sim input[type=text] { min-width: 260px; }
   .sim input[type=number] { width: 90px; }
-  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }
-  .kpi { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; background: #fff; }
-  .kpi span { display: block; font-size: 11.5px; color: var(--muted); }
-  .kpi b { display: block; font-size: 16px; color: var(--navy); font-weight: 600; margin-top: 2px; }
-  .kpi.hl { border-color: var(--orange); background: #FFF6EC; }
-  td.d { white-space: nowrap; font-weight: 500; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+  .kpi { border-radius: 10px; padding: 14px 16px; background: #fff; color: var(--text); }
+  .kpi span { display: block; font-size: 12px; color: var(--muted); }
+  .kpi b { display: block; font-size: 17px; color: var(--navy); font-weight: 600; margin-top: 2px; }
+  .kpi small { display: block; font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+  .kpi.hl { background: #FFF6EC; box-shadow: inset 0 0 0 2px var(--orange); }
+  .kpi.next { background: var(--orange); }
+  .kpi.next span, .kpi.next small { color: #fff; opacity: .9; }
+  .kpi.next b { color: #fff; }
+  td.d { white-space: nowrap; font-weight: 600; color: var(--navy); }
   td.cod { font-weight: 600; color: var(--navy); white-space: nowrap; width: 52px; }
   tr.gwrow td { background: #F6F1FC !important; }
+  tr.prox td { background: #FFF6EC !important; }
   .obs { font-size: 12px; color: var(--muted); margin-top: 3px; }
   .st { font-size: 11.5px; font-weight: 600; border-radius: 999px; padding: 2px 9px; white-space: nowrap; display: inline-block; }
   .st-novo { background: #FAECE7; color: #A8431F; } .st-aj { background: #FFF6D6; color: #7A5A00; } .st-ex { background: #EEF1F5; color: var(--muted); }
+  .st-ok { background: #E3F6FA; color: #006C85; }
   .sug { font-size: 10.5px; font-weight: 600; color: var(--muted); border: 1px dashed #9AA8C2; border-radius: 999px; padding: 1px 7px; margin-left: 6px; white-space: nowrap; }
-  @media (max-width: 600px) { header { padding: 22px 16px; } section { padding: 16px; } }
-  @media print {
-    @page { size: A3 landscape; margin: 10mm; }
-    body { background: #fff; }
-    section { border: none; padding: 0 0 16px; }
-    .diagram { overflow: visible; border: none; max-height: none; }
-    .diagram svg { width: 100%; height: auto; }
-    .toolbar, .sim { display: none; }
-    header, th, .phase td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  }
+  @media (max-width: 600px) { header { padding: 22px 16px 14px; } section { padding: 16px; } .tabs { padding: 0 8px; } }
 </style>
 </head>
 <body>
@@ -89,11 +102,51 @@
   <p>Do novo ciclo ao encerramento, com as posições da equipe como raias, quem faz cada etapa e em quanto tempo</p>
 </header>
 
+<nav class="tabs" id="tabs">
+  <button type="button" class="on" data-tab="tab-fluxo">Fluxo</button>
+  <button type="button" data-tab="tab-etapas">Etapas</button>
+  <button type="button" data-tab="tab-posicoes">O que cada posição faz</button>
+  <button type="button" data-tab="tab-raci">Quem faz o quê (RACI)</button>
+  <button type="button" data-tab="tab-prazos">Prazos</button>
+  <button type="button" class="cal" data-tab="tab-cal">Calendário do ciclo</button>
+</nav>
+
 <main>
 
+<!-- ===================== CALENDÁRIO ===================== -->
+<div class="tab" id="tab-cal">
+
+<section class="cal-hero">
+  <h2>Calendário do ciclo</h2>
+  <p class="sub">Informe o início da trilha e a duração. O sistema calcula sozinho a data-limite de cada marco a partir dos prazos combinados. O kick-off é considerado no primeiro dia da trilha.</p>
+  <noscript><p class="note">O calendário precisa de JavaScript ativado no navegador.</p></noscript>
+  <div class="sim">
+    <label>Início da trilha <input type="date" id="simInicio"></label>
+    <label>Duração da trilha (semanas) <input type="number" id="simSemanas" min="1" max="40" value="8"></label>
+    <label>Feriados (dd/mm/aaaa, separados por vírgula) <input type="text" id="simFeriados" placeholder="ex.: 15/11/2026, 25/12/2026"></label>
+  </div>
+  <div class="kpis" id="simKpis"></div>
+</section>
+
 <section>
-  <h2>1. Fluxo dos processos do Saldo+</h2>
-  <p class="sub">Cada faixa horizontal é uma posição da equipe (ou o parceiro e os participantes). Siga as setas da esquerda para a direita. O número laranja de cada etapa é o mesmo das tabelas abaixo.</p>
+  <h2>Datas de cada marco</h2>
+  <p class="sub">A linha em laranja é o próximo marco a partir de hoje.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>#</th><th>Marco</th><th style="width:190px">Dono</th><th style="width:220px">Regra</th><th style="width:150px">Data-limite</th><th style="width:120px">Situação</th></tr></thead>
+    <tbody id="simBody"></tbody>
+  </table>
+  </div>
+  <p class="note">Prazos em dias úteis pulam sábados, domingos e os feriados informados. Prazos em dias corridos (D−30, 30 dias, 60 dias) contam todos os dias. Datas que caem em fim de semana ou feriado são antecipadas para o dia útil anterior.</p>
+</section>
+
+</div>
+
+<!-- ===================== FLUXO ===================== -->
+<div class="tab on" id="tab-fluxo">
+<section>
+  <h2>Fluxo dos processos do Saldo+</h2>
+  <p class="sub">Cada faixa horizontal é uma posição da equipe (ou o parceiro e os participantes). Siga as setas da esquerda para a direita. O número laranja de cada etapa é o mesmo das tabelas.</p>
 
   <div class="steps">
     <span><b>0</b>Entrada e adesão</span>
@@ -107,7 +160,7 @@
   </div>
 
   <div class="toolbar">
-    <small>Arraste para o lado para ver o fluxo inteiro. Passe o mouse numa etapa para ver o nome completo e o prazo.</small>
+    <small>Role para o lado: o nome das fases e das posições fica fixo. Passe o mouse numa etapa para ver o nome completo e o prazo.</small>
     <div>
       <button type="button" id="btnReal" class="on">Tamanho real</button>
       <button type="button" id="btnFit">Ver inteiro</button>
@@ -136,53 +189,19 @@
 .pill-t{font-size:10.5px;font-weight:600;text-anchor:middle}
 </style></defs>
 <rect class="lane" x="0" y="40" width="11490" height="150"/>
-<rect class="lane-label" x="0" y="40" width="150" height="150" stroke="#fff"/>
-<text class="lane-text" x="75" y="110.5">Parceiro /</text><text class="lane-text" x="75" y="127.5">Gestor escolar</text>
 <rect class="lane-alt" x="0" y="190" width="11490" height="150"/>
-<rect class="lane-label" x="0" y="190" width="150" height="150" stroke="#fff"/>
-<text class="lane-text" x="75" y="269.0">Coordenação</text>
 <rect class="lane" x="0" y="340" width="11490" height="150"/>
-<rect class="lane-label" x="0" y="340" width="150" height="150" stroke="#fff"/>
-<text class="lane-text" x="75" y="419.0">Mobilização</text>
 <rect class="lane-alt" x="0" y="490" width="11490" height="150"/>
-<rect class="lane-label" x="0" y="490" width="150" height="150" stroke="#fff"/>
-<text class="lane-text" x="75" y="560.5">Acompanhamento</text><text class="lane-text" x="75" y="577.5">e Facilitação</text>
 <rect class="lane" x="0" y="640" width="11490" height="150"/>
-<rect class="lane-label" x="0" y="640" width="150" height="150" stroke="#fff"/>
-<text class="lane-text" x="75" y="710.5">Operação da</text><text class="lane-text" x="75" y="727.5">Jornada</text>
 <rect class="lane-alt" x="0" y="790" width="11490" height="150"/>
-<rect class="lane-label" x="0" y="790" width="150" height="150" stroke="#fff"/>
-<text class="lane-text" x="75" y="860.5">Dados e</text><text class="lane-text" x="75" y="877.5">Automação</text>
 <rect class="lane" x="0" y="940" width="11490" height="150"/>
-<rect class="lane-label" x="0" y="940" width="150" height="150" stroke="#fff"/>
-<text class="lane-text" x="75" y="1019.0">Comunicação</text>
 <rect class="lane-alt" x="0" y="1090" width="11490" height="150"/>
-<rect class="lane-label" x="0" y="1090" width="150" height="150" stroke="#fff"/>
-<text class="lane-text" x="75" y="1160.5">Educador /</text><text class="lane-text" x="75" y="1177.5">Participante</text>
-<rect class="lane-label" x="0" y="0" width="150" height="40" stroke="#fff"/>
-<text class="lane-text" x="75.0" y="25">Fases</text>
-<rect class="ph" x="150" y="0" width="700" height="40"/>
-<text class="ph-t" x="164" y="25">0. Entrada e adesão</text>
-<rect class="ph" x="850" y="0" width="2040" height="40"/>
-<text class="ph-t" x="864" y="25">1. Inscrição, formalização e listagem</text>
 <line class="ph-line" x1="850" y1="40" x2="850" y2="1240"/>
-<rect class="ph" x="2890" y="0" width="840" height="40"/>
-<text class="ph-t" x="2904" y="25">2. Planejamento do ciclo</text>
 <line class="ph-line" x1="2890" y1="40" x2="2890" y2="1240"/>
-<rect class="ph" x="3730" y="0" width="1710" height="40"/>
-<text class="ph-t" x="3744" y="25">3. Configuração da plataforma</text>
 <line class="ph-line" x1="3730" y1="40" x2="3730" y2="1240"/>
-<rect class="ph" x="5440" y="0" width="1230" height="40"/>
-<text class="ph-t" x="5454" y="25">4. Preparação</text>
 <line class="ph-line" x1="5440" y1="40" x2="5440" y2="1240"/>
-<rect class="ph" x="6670" y="0" width="1710" height="40"/>
-<text class="ph-t" x="6684" y="25">5. Execução da trilha</text>
 <line class="ph-line" x1="6670" y1="40" x2="6670" y2="1240"/>
-<rect class="ph" x="8380" y="0" width="1680" height="40"/>
-<text class="ph-t" x="8394" y="25">6. Monitoramento e relatórios semanais</text>
 <line class="ph-line" x1="8380" y1="40" x2="8380" y2="1240"/>
-<rect class="ph" x="10060" y="0" width="1410" height="40"/>
-<text class="ph-t" x="10074" y="25">7. Encerramento do ciclo</text>
 <line class="ph-line" x1="10060" y1="40" x2="10060" y2="1240"/>
 <path class="flow" d="M251.0,265.0 L288.5,265.0 L288.5,415.0 L326.0,415.0"/>
 <path class="flow" d="M474.0,415.0 L506.0,415.0"/>
@@ -605,6 +624,49 @@
 <text class="lbl" x="10011.0" y="258.0">Não</text>
 <rect class="lbl-bg" x="9989.0" y="292.0" width="121.9" height="13" rx="2"/>
 <text class="lbl" x="9991.0" y="302.0">Sim: próxima semana</text>
+
+<!-- Camadas fixas: desenhadas por último para ficar por cima ao rolar -->
+<g id="laneLabels">
+<rect class="lane-label" x="0" y="40" width="150" height="150" stroke="#fff"/>
+<text class="lane-text" x="75" y="110.5">Parceiro /</text><text class="lane-text" x="75" y="127.5">Gestor escolar</text>
+<rect class="lane-label" x="0" y="190" width="150" height="150" stroke="#fff"/>
+<text class="lane-text" x="75" y="269.0">Coordenação</text>
+<rect class="lane-label" x="0" y="340" width="150" height="150" stroke="#fff"/>
+<text class="lane-text" x="75" y="419.0">Mobilização</text>
+<rect class="lane-label" x="0" y="490" width="150" height="150" stroke="#fff"/>
+<text class="lane-text" x="75" y="560.5">Acompanhamento</text><text class="lane-text" x="75" y="577.5">e Facilitação</text>
+<rect class="lane-label" x="0" y="640" width="150" height="150" stroke="#fff"/>
+<text class="lane-text" x="75" y="710.5">Operação da</text><text class="lane-text" x="75" y="727.5">Jornada</text>
+<rect class="lane-label" x="0" y="790" width="150" height="150" stroke="#fff"/>
+<text class="lane-text" x="75" y="860.5">Dados e</text><text class="lane-text" x="75" y="877.5">Automação</text>
+<rect class="lane-label" x="0" y="940" width="150" height="150" stroke="#fff"/>
+<text class="lane-text" x="75" y="1019.0">Comunicação</text>
+<rect class="lane-label" x="0" y="1090" width="150" height="150" stroke="#fff"/>
+<text class="lane-text" x="75" y="1160.5">Educador /</text><text class="lane-text" x="75" y="1177.5">Participante</text>
+</g>
+<g id="phaseBar">
+<rect x="0" y="0" width="11490" height="40" fill="#E8EEF9"/>
+<rect class="ph" x="150" y="0" width="700" height="40"/>
+<rect class="ph" x="850" y="0" width="2040" height="40"/>
+<rect class="ph" x="2890" y="0" width="840" height="40"/>
+<rect class="ph" x="3730" y="0" width="1710" height="40"/>
+<rect class="ph" x="5440" y="0" width="1230" height="40"/>
+<rect class="ph" x="6670" y="0" width="1710" height="40"/>
+<rect class="ph" x="8380" y="0" width="1680" height="40"/>
+<rect class="ph" x="10060" y="0" width="1430" height="40"/>
+<text class="ph-t" data-s="150" data-e="850" x="164" y="25">0. Entrada e adesão</text>
+<text class="ph-t" data-s="850" data-e="2890" x="864" y="25">1. Inscrição, formalização e listagem</text>
+<text class="ph-t" data-s="2890" data-e="3730" x="2904" y="25">2. Planejamento do ciclo</text>
+<text class="ph-t" data-s="3730" data-e="5440" x="3744" y="25">3. Configuração da plataforma</text>
+<text class="ph-t" data-s="5440" data-e="6670" x="5454" y="25">4. Preparação</text>
+<text class="ph-t" data-s="6670" data-e="8380" x="6684" y="25">5. Execução da trilha</text>
+<text class="ph-t" data-s="8380" data-e="10060" x="8394" y="25">6. Monitoramento e relatórios semanais</text>
+<text class="ph-t" data-s="10060" data-e="11490" x="10074" y="25">7. Encerramento do ciclo</text>
+</g>
+<g id="corner">
+<rect class="lane-label" x="0" y="0" width="150" height="40" stroke="#fff"/>
+<text class="lane-text" x="75" y="25">Fases</text>
+</g>
 </svg>
   </div>
 
@@ -620,9 +682,12 @@
     <div><span class="sla-pill">⏱ prazo</span><span class="sla-pill wk">⏱ rotina</span><span class="sla-pill ev">⏱ quando acontece</span></div>
   </div>
 </section>
+</div>
 
+<!-- ===================== ETAPAS ===================== -->
+<div class="tab" id="tab-etapas">
 <section>
-  <h2>2. Etapas do processo</h2>
+  <h2>Etapas do processo</h2>
   <p class="sub">Cada etapa com o dono (raia), quem apoia e se ela é nova, ajustada ou já existia. As decisões aparecem em lilás.</p>
   <div class="table-wrap">
   <table>
@@ -717,10 +782,13 @@
   </table>
   </div>
 </section>
+</div>
 
+<!-- ===================== POSIÇÕES ===================== -->
+<div class="tab" id="tab-posicoes">
 <section>
-  <h2>3. O que cada posição faz no fluxo</h2>
-  <p class="sub">Etapas que cada posição executa (R) e as que aprova (A), tiradas da matriz abaixo.</p>
+  <h2>O que cada posição faz no fluxo</h2>
+  <p class="sub">Etapas que cada posição executa (R) e as que aprova (A), tiradas da matriz RACI.</p>
   <div class="roles">
 <div class="role"><h4>Coordenação</h4><ul><li>7.4 Relatório final de impacto e prestação de contas</li><li>7.6 Registrar os aprendizados do ciclo</li></ul><p class="role-ap"><b>Aprova o que outros executam:</b> 0.1, 0.2, 1.2a, 2.1, 2.3, 2.4, 3.4, 4.5, 7.1, 7.3, 7.5, 7.7</p></div>
 <div class="role"><h4>Mobilização</h4><ul><li>0.1 Prospectar escolas, ONGs e parceiros e apresentar o programa</li><li>0.2 Alinhar a adesão: papéis, cronograma e requisitos (internet e laboratório)</li><li>0.3 Definir o ponto focal da escola/organização</li><li>1.1 Enviar formulário de inscrição</li><li>1.2a Sem infraestrutura: avaliar alternativa (modelo híbrido/material impresso) ou registrar o motivo e reavaliar no próximo ciclo</li><li>1.3 Enviar formulário de formalização</li><li>1.5 Solicitar a listagem de participantes</li><li>1.7 Conferir e validar a listagem</li><li>5.7 Visitas às escolas e coleta de evidências (fotos, depoimentos)</li><li>6.6 Acionar gestão escolar/secretaria</li><li>7.5 Devolutiva ao parceiro (resultados da escola/organização)</li></ul><p class="role-ap"><b>Aprova o que outros executam:</b> 1.2, 1.4, 1.6</p></div>
@@ -731,9 +799,12 @@
 <div class="role"><h4>Metodologia</h4><ul><li><i>Não executa etapas; valida e é consultada.</i></li></ul><p class="role-ap"><b>Aprova o que outros executam:</b> 2.2</p></div>
   </div>
 </section>
+</div>
 
+<!-- ===================== RACI ===================== -->
+<div class="tab" id="tab-raci">
 <section>
-  <h2>4. Quem faz o quê (matriz RACI)</h2>
+  <h2>Quem faz o quê (matriz RACI)</h2>
   <p class="sub">
     <b class="R">R</b> Faz a etapa &nbsp;·&nbsp;
     <b class="A">A</b> Aprova e responde pelo resultado &nbsp;·&nbsp;
@@ -819,11 +890,14 @@
   </table>
   </div>
 </section>
+</div>
 
-<section id="sla">
-  <h2>5. Prazos</h2>
+<!-- ===================== PRAZOS ===================== -->
+<div class="tab" id="tab-prazos">
+<section>
+  <h2>Prazos</h2>
   <p class="sub">
-    Prazos da planilha de SLA, completados com sugestões para as etapas que estavam sem prazo (marcadas com <span class="sug">sugestão</span>). Tudo ainda está para a equipe validar.
+    Prazos da planilha de SLA, completados com sugestões para as etapas que estavam sem prazo (marcadas com <span class="sug">sugestão</span>). Tudo ainda está para a equipe validar. As datas calculadas estão na aba <b>Calendário do ciclo</b>.
   </p>
 
   <h3>Prazo por etapa</h3>
@@ -910,29 +984,48 @@
     </tbody>
   </table>
   </div>
-
-  <h3>Calendário do ciclo</h3>
-  <p class="sub">Informe o início da trilha e a duração. As datas-limite saem dos prazos acima. O kick-off é considerado no primeiro dia da trilha.</p>
-  <noscript><p class="note">O calendário precisa de JavaScript ativado no navegador.</p></noscript>
-  <div class="sim">
-    <label>Início da trilha <input type="date" id="simInicio"></label>
-    <label>Duração da trilha (semanas) <input type="number" id="simSemanas" min="1" max="40" value="8"></label>
-    <label>Feriados (dd/mm/aaaa, separados por vírgula) <input type="text" id="simFeriados" placeholder="ex.: 15/11/2026, 25/12/2026"></label>
-  </div>
-  <div class="kpis" id="simKpis"></div>
-  <div class="table-wrap">
-  <table>
-    <thead><tr><th>#</th><th>Marco</th><th style="width:190px">Dono</th><th style="width:220px">Regra</th><th style="width:140px">Data-limite</th></tr></thead>
-    <tbody id="simBody"></tbody>
-  </table>
-  </div>
-  <p class="note">Prazos em dias úteis pulam sábados, domingos e os feriados informados. Prazos em dias corridos (D−30, 30 dias, 60 dias) contam todos os dias. Datas que caem em fim de semana ou feriado são antecipadas para o dia útil anterior.</p>
 </section>
+</div>
 
 </main>
 
 <script>
-/* Calendário do ciclo: datas-limite a partir do início da trilha */
+/* ---------- Abas ---------- */
+const tabBtns = document.querySelectorAll("#tabs button");
+function abrirAba(id){
+  tabBtns.forEach(b=>b.classList.toggle("on", b.dataset.tab===id));
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on", t.id===id));
+  if(id==="tab-fluxo") requestAnimationFrame(fixarCamadas);
+  try { history.replaceState(null,"","#"+id.replace("tab-","")); } catch(e){}
+}
+tabBtns.forEach(b=>b.addEventListener("click",()=>abrirAba(b.dataset.tab)));
+
+/* ---------- Fases e posições fixas ao rolar o fluxo ---------- */
+const dg = document.getElementById("diagram");
+const laneLabels = document.getElementById("laneLabels");
+const phaseBar = document.getElementById("phaseBar");
+const corner = document.getElementById("corner");
+const phTitles = phaseBar.querySelectorAll("text.ph-t");
+function fixarCamadas(){
+  const fit = dg.classList.contains("fit");
+  const sl = fit ? 0 : dg.scrollLeft;
+  const st = fit ? 0 : dg.scrollTop;
+  laneLabels.setAttribute("transform", `translate(${sl},0)`);
+  phaseBar.setAttribute("transform", `translate(0,${st})`);
+  corner.setAttribute("transform", `translate(${sl},${st})`);
+  phTitles.forEach(t=>{
+    const s = +t.dataset.s, e = +t.dataset.e;
+    const w = t.getComputedTextLength() || 0;
+    const x = Math.min(Math.max(s + 14, sl + 150 + 14), e - w - 14);
+    t.setAttribute("x", Math.max(x, s + 14));
+  });
+}
+dg.addEventListener("scroll", fixarCamadas, {passive:true});
+const btnReal = document.getElementById("btnReal"), btnFit = document.getElementById("btnFit");
+btnReal.addEventListener("click",()=>{dg.classList.remove("fit");btnReal.classList.add("on");btnFit.classList.remove("on");fixarCamadas();});
+btnFit.addEventListener("click",()=>{dg.classList.add("fit");btnFit.classList.add("on");btnReal.classList.remove("on");fixarCamadas();});
+
+/* ---------- Calendário do ciclo ---------- */
 const MARCOS = [
   {fase:"Antes do ciclo"},
   {cod:"2.1", nome:"Cronograma de execução pronto", dono:"Operação da Jornada", regra:"30 dias antes do início", f:(c)=>corridos(c.ini,-30)},
@@ -973,6 +1066,15 @@ function lerFeriados(){
     if(m) FER.add(m[3]+"-"+m[2].padStart(2,"0")+"-"+m[1].padStart(2,"0"));
   });
 }
+function hoje(){const h=new Date();h.setHours(0,0,0,0);return h;}
+function faltam(dt){return Math.round((dt-hoje())/864e5);}
+function situacao(n){
+  if(n<0) return `<span class="st st-ex">Já passou</span>`;
+  if(n===0) return `<span class="st st-novo">Hoje</span>`;
+  if(n===1) return `<span class="st st-aj">Amanhã</span>`;
+  if(n<=7) return `<span class="st st-aj">Em ${n} dias</span>`;
+  return `<span class="st st-ok">Em ${n} dias</span>`;
+}
 function simular(){
   const v=document.getElementById("simInicio").value; if(!v)return;
   lerFeriados();
@@ -982,20 +1084,27 @@ function simular(){
   const fim=du(ini,semanas*5-1);
   const evento=du(fim,10);
   const c={ini,fim,evento}, k={};
-  const rows=MARCOS.map(x=>{
-    if(x.fase) return `<tr class="phase"><td colspan="5">${x.fase}</td></tr>`;
-    const dt=x.f(c); k[x.cod||"fim"]=dt;
+  // calcula todas as datas e acha o próximo marco
+  const lista=MARCOS.map(x=>x.fase?x:Object.assign({},x,{dt:x.f(c)}));
+  let prox=null;
+  lista.forEach(x=>{ if(!x.fase){ k[x.cod||"fim"]=x.dt; if(faltam(x.dt)>=0 && (!prox || x.dt<prox.dt)) prox=x; }});
+  const rows=lista.map(x=>{
+    if(x.fase) return `<tr class="phase"><td colspan="6">${x.fase}</td></tr>`;
     const sug=x.sug?' <span class="sug">sugestão</span>':'';
-    return `<tr><td class="cod">${x.cod}</td><td>${x.nome}</td><td>${x.dono}</td><td>${x.regra}${sug}</td><td class="d">${fmt(dt)}</td></tr>`;
+    const cls=(x===prox)?' class="prox"':'';
+    return `<tr${cls}><td class="cod">${x.cod}</td><td>${x.nome}</td><td>${x.dono}</td><td>${x.regra}${sug}</td><td class="d">${fmt(x.dt)}</td><td>${situacao(faltam(x.dt))}</td></tr>`;
   });
   document.getElementById("simBody").innerHTML=rows.join("");
-  document.getElementById("simKpis").innerHTML=`
+  const proxCard = prox
+    ? `<div class="kpi next"><span>Próximo marco</span><b>${fmt(prox.dt)}</b><small>${prox.cod?prox.cod+" · ":""}${prox.nome}</small></div>`
+    : `<div class="kpi next"><span>Próximo marco</span><b>Ciclo concluído</b><small>Todas as datas já passaram</small></div>`;
+  document.getElementById("simKpis").innerHTML= proxCard + `
     <div class="kpi"><span>Cronograma pronto</span><b>${fmt(k["2.1"])}</b></div>
     <div class="kpi"><span>Curso liberado</span><b>${fmt(k["3.7"])}</b></div>
     <div class="kpi hl"><span>Kick-off e início</span><b>${fmt(ini)}</b></div>
     <div class="kpi"><span>Fim da trilha</span><b>${fmt(fim)}</b></div>
     <div class="kpi"><span>Relatório final de impacto</span><b>${fmt(k["7.4"])}</b></div>
-    <div class="kpi hl"><span>Acessos desativados</span><b>${fmt(k["7.7"])}</b></div>`;
+    <div class="kpi"><span>Acessos desativados</span><b>${fmt(k["7.7"])}</b></div>`;
 }
 (function(){
   const h=proxSegunda(new Date(Date.now()+42*864e5));
@@ -1005,9 +1114,10 @@ function simular(){
     el.addEventListener("input",simular); el.addEventListener("change",simular);
   });
   simular();
-  const dg=document.getElementById("diagram"), a=document.getElementById("btnReal"), b=document.getElementById("btnFit");
-  a.addEventListener("click",()=>{dg.classList.remove("fit");a.classList.add("on");b.classList.remove("on");});
-  b.addEventListener("click",()=>{dg.classList.add("fit");b.classList.add("on");a.classList.remove("on");});
+  // abre a aba indicada no endereço (ex.: #cal), senão o fluxo
+  const alvo = "tab-" + (location.hash||"").replace("#","");
+  if(document.getElementById(alvo)) abrirAba(alvo);
+  fixarCamadas();
 })();
 </script>
 </body>
